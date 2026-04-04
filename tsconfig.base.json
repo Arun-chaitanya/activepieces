@@ -791,6 +791,9 @@
       "@activepieces/piece-openai": [
         "packages/pieces/community/openai/src/index.ts"
       ],
+      "@activepieces/piece-opplify": [
+        "packages/pieces/community/opplify/src/index.ts"
+      ],
       "@activepieces/piece-oracle-fusion-cloud-erp": [
         "packages/pieces/community/oracle-fusion-cloud-erp/src/index.ts"
       ],

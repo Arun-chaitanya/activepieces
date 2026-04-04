@@ -12,8 +12,30 @@
         "tsConfig": "packages/pieces/community/opplify/tsconfig.lib.json",
         "packageJson": "packages/pieces/community/opplify/package.json",
         "main": "packages/pieces/community/opplify/src/index.ts",
-        "assets": ["packages/pieces/community/opplify/*.md"]
-      }
+        "assets": ["packages/pieces/community/opplify/*.md"],
+        "buildableProjectDepsInPackageJsonType": "dependencies",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "clean": false
+      },
+      "dependsOn": [
+        "^build",
+        "prebuild"
+      ]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "prebuild": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/pieces/community/opplify",
+        "command": "bun install --no-save --silent"
+      },
+      "dependsOn": [
+        "^build"
+      ]
     }
-  }
+  },
+  "tags": []
 }
