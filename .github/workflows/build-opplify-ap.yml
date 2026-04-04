@@ -42,3 +42,104 @@ jobs:
             ${{ env.IMAGE }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  publish-piece:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build-and-push
+    # Only publish when piece code changes (not for unrelated commits)
+    if: ${{ always() && needs.build-and-push.result == 'success' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if piece changed
+        id: changed
+        run: |
+          # Check if any opplify piece files changed in this push
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- packages/pieces/community/opplify/ 2>/dev/null || echo "first-run")
+          if [ -z "$CHANGED" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "No piece changes detected, skipping publish"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "Piece changes detected: $CHANGED"
+          fi
+
+      - name: Setup Node.js
+        if: steps.changed.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install bun
+        if: steps.changed.outputs.skip != 'true'
+        run: curl -fsSL https://bun.sh/install | bash && echo "$HOME/.bun/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        if: steps.changed.outputs.skip != 'true'
+        run: bun install --frozen-lockfile
+
+      - name: Auto-bump piece version
+        if: steps.changed.outputs.skip != 'true'
+        id: version
+        run: |
+          PKG="packages/pieces/community/opplify/package.json"
+          CURRENT=$(node -e "console.log(require('./$PKG').version)")
+          # Bump patch version
+          IFS='.' read -r major minor patch <<< "$CURRENT"
+          NEW="${major}.${minor}.$((patch + 1))"
+          # Update package.json
+          sed -i "s/\"version\": \"${CURRENT}\"/\"version\": \"${NEW}\"/" "$PKG"
+          echo "version=$NEW" >> $GITHUB_OUTPUT
+          echo "Piece version: $CURRENT -> $NEW"
+
+      - name: Build piece
+        if: steps.changed.outputs.skip != 'true'
+        run: echo "opplify" | npm run build-piece
+
+      - name: Authenticate with AP
+        if: steps.changed.outputs.skip != 'true'
+        id: auth
+        run: |
+          TOKEN=$(curl -sf -X POST "${{ secrets.AP_PRODUCTION_URL }}/api/v1/authentication/sign-in" \
+            -H "Content-Type: application/json" \
+            -d "{\"email\":\"${{ secrets.AP_ADMIN_EMAIL }}\",\"password\":\"${{ secrets.AP_ADMIN_PASSWORD }}\"}" \
+            | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Publish piece to production
+        if: steps.changed.outputs.skip != 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TGZ="dist/packages/pieces/community/opplify/activepieces-piece-opplify-${VERSION}.tgz"
+
+          if [ ! -f "$TGZ" ]; then
+            echo "Error: TGZ not found at $TGZ"
+            ls -la dist/packages/pieces/community/opplify/ || true
+            exit 1
+          fi
+
+          echo "Publishing v${VERSION} to ${{ secrets.AP_PRODUCTION_URL }}..."
+
+          RESULT=$(curl -sf -X POST "${{ secrets.AP_PRODUCTION_URL }}/api/v1/pieces" \
+            -H "Authorization: Bearer ${{ steps.auth.outputs.token }}" \
+            -F "pieceArchive=@${TGZ}" \
+            -F "packageType=ARCHIVE" \
+            -F "pieceName=activepieces-piece-opplify" \
+            -F "pieceVersion=${VERSION}" \
+            -F "scope=PLATFORM" 2>&1)
+
+          echo "$RESULT" | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          v = d.get('version', 'FAILED')
+          t = len(d.get('triggers', {}))
+          a = len(d.get('actions', {}))
+          print(f'Published v{v} | Triggers: {t} | Actions: {a}')
+          if v == 'FAILED':
+              print(f'Full response: {d}')
+              sys.exit(1)
+          "
