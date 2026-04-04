@@ -74,21 +74,15 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   task_created: { event: 'task_created', timestamp: NOW, lead: SAMPLE_LEAD, data: { taskId: '550e8400-0000-0000-0000-000000000060', title: 'Follow up with lead' } },
   task_completed: { event: 'task_completed', timestamp: NOW, lead: SAMPLE_LEAD, data: { taskId: '550e8400-0000-0000-0000-000000000060', title: 'Follow up with lead', completedAt: NOW } },
   task_assigned: { event: 'task_assigned', timestamp: NOW, lead: SAMPLE_LEAD, data: { taskId: '550e8400-0000-0000-0000-000000000060', assignedTo: '550e8400-0000-0000-0000-000000000003' } },
-  task_overdue: { event: 'task_overdue', timestamp: NOW, lead: SAMPLE_LEAD, data: { taskId: '550e8400-0000-0000-0000-000000000060', title: 'Follow up with lead', dueDate: '2026-03-18T12:00:00.000Z' } },
 
   // -- Activity --
   repeat_visit: { event: 'repeat_visit', timestamp: NOW, lead: SAMPLE_LEAD, data: { visitorId: 'v_abc123', visitNumber: 3 } },
-  conversion_tracked: { event: 'conversion_tracked', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', visitorId: 'v_abc123', conversionType: 'signup' } },
 
   // -- Communication (new inbound) --
   email_received: { event: 'email_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: 'john@example.com', subject: 'Re: Your proposal', body: 'I reviewed the proposal and have some questions.' } },
   sms_received: { event: 'sms_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: '+14155551234', message: 'Yes, I am interested. Please call me.' } },
   email_unsubscribed: { event: 'email_unsubscribed', timestamp: NOW, lead: SAMPLE_LEAD, data: { email: 'john@example.com', reason: 'No longer interested' } },
 
-  // -- Voice / Calling --
-  voice_call_started: { event: 'voice_call_started', timestamp: NOW, lead: SAMPLE_LEAD, data: { sessionId: '550e8400-0000-0000-0000-000000000070', roomName: 'call-john-doe', agentType: 'sales' } },
-  voice_call_ended: { event: 'voice_call_ended', timestamp: NOW, lead: SAMPLE_LEAD, data: { sessionId: '550e8400-0000-0000-0000-000000000070', durationSeconds: 245, status: 'ended' } },
-  call_transcript_available: { event: 'call_transcript_available', timestamp: NOW, lead: SAMPLE_LEAD, data: { sessionId: '550e8400-0000-0000-0000-000000000070', transcriptLength: 1250, summary: 'Discussed pricing and next steps. Lead interested in Enterprise plan.' } },
 
   // -- Products --
   product_created: { event: 'product_created', timestamp: NOW, lead: null, data: { productId: '550e8400-0000-0000-0000-000000000080', name: 'Pro Plan', price: 99.99, productType: 'service' } },

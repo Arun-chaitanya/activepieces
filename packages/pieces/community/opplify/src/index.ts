@@ -3,7 +3,7 @@ import { PieceCategory } from '@activepieces/shared';
 import { opplifyAuth } from './lib/common/auth';
 
 // ============================================================================
-// TRIGGERS (55 total, 10 categories)
+// TRIGGERS (50 total, 9 categories)
 // ============================================================================
 
 // Category 1: Contacts / Leads (10)
@@ -56,20 +56,13 @@ import { orderFulfilled } from './lib/triggers/orders/order-fulfilled';
 import { orderRefunded } from './lib/triggers/orders/order-refunded';
 import { orderCancelled } from './lib/triggers/orders/order-cancelled';
 
-// Category 7: Tasks (4)
+// Category 7: Tasks (3)
 import { taskCreated } from './lib/triggers/tasks/task-created';
 import { taskCompleted } from './lib/triggers/tasks/task-completed';
 import { taskAssigned } from './lib/triggers/tasks/task-assigned';
-import { taskOverdue } from './lib/triggers/tasks/task-overdue';
 
-// Category 8: Activity / Engagement (2)
+// Category 8: Activity / Engagement (1)
 import { repeatVisit } from './lib/triggers/activity/repeat-visit';
-import { conversionTracked } from './lib/triggers/activity/conversion-tracked';
-
-// Category 9: Voice / Calling (3)
-import { voiceCallStarted } from './lib/triggers/voice/voice-call-started';
-import { voiceCallEnded } from './lib/triggers/voice/voice-call-ended';
-import { callTranscriptAvailable } from './lib/triggers/voice/call-transcript-available';
 
 // Category 10: Products (3)
 import { productCreated } from './lib/triggers/products/product-created';
@@ -197,18 +190,12 @@ export const opplify = createPiece({
     orderFulfilled,
     orderRefunded,
     orderCancelled,
-    // Tasks (4)
+    // Tasks (3)
     taskCreated,
     taskCompleted,
     taskAssigned,
-    taskOverdue,
-    // Activity / Engagement (2)
+    // Activity / Engagement (1)
     repeatVisit,
-    conversionTracked,
-    // Voice / Calling (3)
-    voiceCallStarted,
-    voiceCallEnded,
-    callTranscriptAvailable,
     // Products (3)
     productCreated,
     productUpdated,
