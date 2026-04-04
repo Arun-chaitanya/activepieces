@@ -34,17 +34,9 @@ export const SAMPLE_DATA: Record<string, unknown> = {
 
   // -- Funnels, Pages & Forms --
   funnel_created: { event: 'funnel_created', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', name: 'Sales Landing Page', funnelType: 'salesFunnel' } },
-  funnel_published: { event: 'funnel_published', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', publishedUrl: 'https://app.getopplify.com/p/sales' } },
-  funnel_unpublished: { event: 'funnel_unpublished', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010' } },
-  funnel_archived: { event: 'funnel_archived', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010' } },
-  funnel_updated: { event: 'funnel_updated', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', versionNumber: 3, changeType: 'user_edited' } },
-  funnel_version_restored: { event: 'funnel_version_restored', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', restoredVersion: 2 } },
-  form_submitted: { event: 'form_submitted', timestamp: NOW, lead: SAMPLE_LEAD, data: { formId: '550e8400-0000-0000-0000-000000000020', formName: 'Contact Form', submissionData: { name: 'Jane Smith', email: 'jane@example.com', message: 'Interested' } } },
-  form_partial: { event: 'form_partial', timestamp: NOW, lead: SAMPLE_LEAD, data: { formId: '550e8400-0000-0000-0000-000000000020', currentStep: 2, totalSteps: 4, partialData: { email: 'partial@example.com' } } },
-  form_viewed: { event: 'form_viewed', timestamp: NOW, lead: null, data: { formId: '550e8400-0000-0000-0000-000000000020', visitorId: 'v_abc123', pageUrl: '/landing' } },
-  page_visited: { event: 'page_visited', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', pageName: 'Landing Page', pageUrl: '/sales', visitorId: 'v_abc123', deviceType: 'desktop' } },
-  pricing_page_visited: { event: 'pricing_page_visited', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', pageUrl: '/pricing', visitorId: 'v_abc123' } },
-  conversion: { event: 'conversion', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', conversionType: 'form_submit', visitorId: 'v_abc123' } },
+  funnel_activity: { event: 'funnel_activity', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', action: 'published' } },
+  form_submitted: { event: 'form_submitted', timestamp: NOW, lead: SAMPLE_LEAD, data: { formId: '550e8400-0000-0000-0000-000000000020', funnelId: '550e8400-0000-0000-0000-000000000010', formName: 'Contact Form', submissionData: { name: 'Jane Smith', email: 'jane@example.com', message: 'Interested' } } },
+  page_visited: { event: 'page_visited', timestamp: NOW, lead: SAMPLE_LEAD, data: { funnelId: '550e8400-0000-0000-0000-000000000010', pageName: 'Landing Page', pageUrl: '/sales', visitorId: 'v_abc123', deviceType: 'desktop' } },
 
   // -- Communication --
   email_sent: { event: 'email_sent', timestamp: NOW, lead: SAMPLE_LEAD, data: { subject: 'Welcome!', toEmail: 'john@example.com' } },
@@ -52,12 +44,10 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   email_opened: { event: 'email_opened', timestamp: NOW, lead: SAMPLE_LEAD, data: { subject: 'Welcome!', openCount: 1 } },
   email_clicked: { event: 'email_clicked', timestamp: NOW, lead: SAMPLE_LEAD, data: { subject: 'Welcome!', clickedUrl: 'https://app.getopplify.com/pricing' } },
   email_bounced: { event: 'email_bounced', timestamp: NOW, lead: SAMPLE_LEAD, data: { subject: 'Welcome!', bounceType: 'hard', reason: 'Mailbox not found' } },
-  email_replied: { event: 'email_replied', timestamp: NOW, lead: SAMPLE_LEAD, data: { subject: 'Re: Welcome!', replyBody: 'Thanks, I would like to learn more.' } },
   spam_reported: { event: 'spam_reported', timestamp: NOW, lead: SAMPLE_LEAD, data: { subject: 'Welcome!' } },
   sms_sent: { event: 'sms_sent', timestamp: NOW, lead: SAMPLE_LEAD, data: { message: 'Your appointment is tomorrow at 2pm.' } },
   sms_delivered: { event: 'sms_delivered', timestamp: NOW, lead: SAMPLE_LEAD, data: { message: 'Your appointment is tomorrow at 2pm.', messageId: 'sms_xyz' } },
   sms_failed: { event: 'sms_failed', timestamp: NOW, lead: SAMPLE_LEAD, data: { message: 'Your appointment is tomorrow at 2pm.', errorReason: 'Invalid phone number' } },
-  call_logged: { event: 'call_logged', timestamp: NOW, lead: SAMPLE_LEAD, data: { direction: 'outbound', outcome: 'answered', duration: 180 } },
   note_created: { event: 'note_created', timestamp: NOW, lead: SAMPLE_LEAD, data: { noteContent: 'Discussed pricing options.', noteType: 'call', createdBy: '550e8400-0000-0000-0000-000000000003' } },
 
   // -- Appointments --
@@ -66,18 +56,14 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   appointment_cancelled: { event: 'appointment_cancelled', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030', cancelledBy: 'contact', reason: 'Schedule conflict' } },
   appointment_completed: { event: 'appointment_completed', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030' } },
   appointment_no_show: { event: 'appointment_no_show', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030' } },
-  appointment_reminder: { event: 'appointment_reminder', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030', reminderAt: NOW } },
 
   // -- Deals --
   deal_created: { event: 'deal_created', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', stage: 'discovery', amount: 5000, title: 'Enterprise Plan' } },
   deal_stage_changed: { event: 'deal_stage_changed', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', oldStage: 'discovery', newStage: 'proposal' } },
-  deal_closed_won: { event: 'deal_closed_won', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', amount: 5000 } },
-  deal_closed_lost: { event: 'deal_closed_lost', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', amount: 5000 } },
   deal_amount_changed: { event: 'deal_amount_changed', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', oldAmount: 5000, newAmount: 7500 } },
   deal_assigned: { event: 'deal_assigned', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', assignedTo: '550e8400-0000-0000-0000-000000000003' } },
 
   // -- Orders & Payments --
-  order_placed: { event: 'order_placed', timestamp: NOW, lead: SAMPLE_LEAD, data: { orderId: '550e8400-0000-0000-0000-000000000050', totalAmount: 99.99, currency: 'USD' } },
   payment_completed: { event: 'payment_completed', timestamp: NOW, lead: SAMPLE_LEAD, data: { orderId: '550e8400-0000-0000-0000-000000000050', amount: 99.99, paymentMethod: 'stripe' } },
   payment_failed: { event: 'payment_failed', timestamp: NOW, lead: SAMPLE_LEAD, data: { orderId: '550e8400-0000-0000-0000-000000000050', amount: 99.99, errorReason: 'Card declined' } },
   order_fulfilled: { event: 'order_fulfilled', timestamp: NOW, lead: SAMPLE_LEAD, data: { orderId: '550e8400-0000-0000-0000-000000000050', fulfilledAt: NOW } },
