@@ -1,4 +1,4 @@
-import { createAction, Property } from '@activepieces/pieces-framework';
+import { createAction, PieceAuth, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
 
@@ -14,21 +14,22 @@ export const changeLifecycleStageAction = createAction({
       description: 'The ID of the lead',
       required: true,
     }),
-    stage: Property.StaticDropdown({
+    stage: Property.Dropdown({
+      auth: PieceAuth.None(),
       displayName: 'Lifecycle Stage',
       description: 'New lifecycle stage',
       required: true,
-      options: {
-        disabled: false,
-        options: [
-          { label: 'Subscriber', value: 'subscriber' },
-          { label: 'Lead', value: 'lead' },
-          { label: 'Marketing Qualified Lead', value: 'marketing_qualified_lead' },
-          { label: 'Sales Qualified Lead', value: 'sales_qualified_lead' },
-          { label: 'Opportunity', value: 'opportunity' },
-          { label: 'Customer', value: 'customer' },
-          { label: 'Evangelist', value: 'evangelist' },
-        ],
+      refreshers: [],
+      options: async (_propsValue, context) => {
+        try {
+          const externalId = await context.project.externalId() || '';
+          const ctx = { projectId: context.project.id, externalId, baseUrl: process.env['AP_OPPLIFY_BASE_URL'] || 'http://host.docker.internal:3001' };
+          const client = opplifyClient(ctx);
+          const result = await client.getMeta('lifecycle-stages') as { stages: Array<{ label: string; value: string }> };
+          return { disabled: false, options: result.stages || [] };
+        } catch {
+          return { disabled: true, options: [], placeholder: 'Failed to load lifecycle stages' };
+        }
       },
     }),
   },

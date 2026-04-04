@@ -1,4 +1,4 @@
-import { createAction, Property } from '@activepieces/pieces-framework';
+import { createAction, PieceAuth, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
 
@@ -14,10 +14,23 @@ export const setCustomFieldAction = createAction({
       description: 'The ID of the lead',
       required: true,
     }),
-    fieldName: Property.ShortText({
-      displayName: 'Field Name',
-      description: 'The name of the custom field',
+    fieldName: Property.Dropdown({
+      auth: PieceAuth.None(),
+      displayName: 'Custom Field',
+      description: 'Select the custom field to set',
       required: true,
+      refreshers: [],
+      options: async (_propsValue, context) => {
+        try {
+          const externalId = await context.project.externalId() || '';
+          const ctx = { projectId: context.project.id, externalId, baseUrl: process.env['AP_OPPLIFY_BASE_URL'] || 'http://host.docker.internal:3001' };
+          const client = opplifyClient(ctx);
+          const result = await client.getMeta('custom-fields') as { customFields: Array<{ label: string; value: string }> };
+          return { disabled: false, options: result.customFields || [] };
+        } catch {
+          return { disabled: true, options: [], placeholder: 'Failed to load custom fields' };
+        }
+      },
     }),
     value: Property.ShortText({
       displayName: 'Value',

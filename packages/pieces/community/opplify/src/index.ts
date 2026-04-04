@@ -3,7 +3,7 @@ import { PieceCategory } from '@activepieces/shared';
 import { opplifyAuth } from './lib/common/auth';
 
 // ============================================================================
-// TRIGGERS (50 total, 9 categories)
+// TRIGGERS (48 total, 9 categories)
 // ============================================================================
 
 // Category 1: Contacts / Leads (10)

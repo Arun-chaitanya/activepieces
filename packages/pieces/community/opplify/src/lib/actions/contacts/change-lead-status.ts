@@ -1,4 +1,4 @@
-import { createAction, Property } from '@activepieces/pieces-framework';
+import { createAction, PieceAuth, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
 
@@ -15,20 +15,22 @@ export const changeLeadStatusAction = createAction({
       description: 'The ID of the lead',
       required: true,
     }),
-    status: Property.StaticDropdown({
+    status: Property.Dropdown({
+      auth: PieceAuth.None(),
       displayName: 'Status',
       description: 'New lead status',
       required: true,
-      options: {
-        disabled: false,
-        options: [
-          { label: 'New', value: 'new' },
-          { label: 'Contacted', value: 'contacted' },
-          { label: 'Qualified', value: 'qualified' },
-          { label: 'Converted', value: 'converted' },
-          { label: 'Lost', value: 'lost' },
-          { label: 'Archived', value: 'archived' },
-        ],
+      refreshers: [],
+      options: async (_propsValue, context) => {
+        try {
+          const externalId = await context.project.externalId() || '';
+          const ctx = { projectId: context.project.id, externalId, baseUrl: process.env['AP_OPPLIFY_BASE_URL'] || 'http://host.docker.internal:3001' };
+          const client = opplifyClient(ctx);
+          const result = await client.getMeta('statuses') as { statuses: Array<{ label: string; value: string }> };
+          return { disabled: false, options: result.statuses || [] };
+        } catch {
+          return { disabled: true, options: [], placeholder: 'Failed to load statuses' };
+        }
       },
     }),
   },
