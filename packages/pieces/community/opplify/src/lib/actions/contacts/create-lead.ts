@@ -10,7 +10,7 @@ import {
 export const createLeadAction = createAction({
   name: 'create_lead',
   displayName: 'Create Lead',
-  description: 'Creates a new lead in your GetOpplify CRM.',
+  description: 'Creates a new lead in your Opplify CRM.',
   auth: opplifyAuth,
   requireAuth: true,
   props: {

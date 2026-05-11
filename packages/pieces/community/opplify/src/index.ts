@@ -131,7 +131,7 @@ import { updateProductAction } from './lib/actions/products/update-product';
 // ============================================================================
 
 export const opplify = createPiece({
-  displayName: 'GetOpplify',
+  displayName: 'Opplify',
   description:
     'AI-powered sales funnel & CRM platform. ' +
     'Triggers for leads, forms, funnels, appointments, deals, communications, tasks, and orders. ' +
