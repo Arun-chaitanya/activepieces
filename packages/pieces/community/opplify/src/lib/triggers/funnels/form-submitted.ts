@@ -8,6 +8,7 @@ export const formSubmitted = createOpplifyTrigger({
   description:
     'Triggers when a form is submitted through a funnel. Filter by funnel to watch a specific one.',
   eventType: 'form_submitted',
+  sourceType: 'funnel',
   props: {
     funnelId: funnelIdDropdown,
   },

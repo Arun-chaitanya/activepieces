@@ -8,6 +8,7 @@ export const funnelActivity = createOpplifyTrigger({
   description:
     'Triggers on funnel lifecycle events: published, unpublished, archived, page updated, or version restored.',
   eventType: 'funnel_activity',
+  sourceType: 'funnel',
   props: {
     funnelId: funnelIdDropdown,
     action: funnelActionDropdown,

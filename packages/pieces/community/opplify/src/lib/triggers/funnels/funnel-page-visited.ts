@@ -8,6 +8,7 @@ export const funnelPageVisited = createOpplifyTrigger({
   description:
     'Triggers when a visitor views a page on a published funnel.',
   eventType: 'page_visited',
+  sourceType: 'funnel',
   props: {
     funnelId: funnelIdDropdown,
   },
