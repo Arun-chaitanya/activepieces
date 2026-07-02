@@ -3,7 +3,7 @@ import { PieceCategory } from '@activepieces/shared';
 import { opplifyAuth } from './lib/common/auth';
 
 // ============================================================================
-// TRIGGERS (48 total, 9 categories)
+// TRIGGERS (53 total, 9 categories)
 // ============================================================================
 
 // Category 1: Contacts / Leads (10)
@@ -74,8 +74,15 @@ import { emailReceived } from './lib/triggers/communication/email-received';
 import { smsReceived } from './lib/triggers/communication/sms-received';
 import { emailUnsubscribed } from './lib/triggers/communication/email-unsubscribed';
 
+// WhatsApp via AISensy (5)
+import { whatsappSent } from './lib/triggers/communication/whatsapp-sent';
+import { whatsappDelivered } from './lib/triggers/communication/whatsapp-delivered';
+import { whatsappRead } from './lib/triggers/communication/whatsapp-read';
+import { whatsappFailed } from './lib/triggers/communication/whatsapp-failed';
+import { whatsappReceived } from './lib/triggers/communication/whatsapp-received';
+
 // ============================================================================
-// ACTIONS (32 total, 9 categories)
+// ACTIONS (33 total, 9 categories)
 // ============================================================================
 
 // Category 1: Contacts / Leads (12)
@@ -101,6 +108,7 @@ import { archiveFunnelAction } from './lib/actions/funnels/archive-funnel';
 // Category 3: Communication (3)
 import { sendEmailAction } from './lib/actions/communication/send-email';
 import { sendSmsAction } from './lib/actions/communication/send-sms';
+import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
 
 // Category 4: Appointments (5)
@@ -172,6 +180,11 @@ export const opplify = createPiece({
     smsDelivered,
     smsFailed,
     smsReceived,
+    whatsappSent,
+    whatsappDelivered,
+    whatsappRead,
+    whatsappFailed,
+    whatsappReceived,
     noteCreated,
     // Appointments / Scheduling (5)
     appointmentBooked,
@@ -224,6 +237,7 @@ export const opplify = createPiece({
     // Communication (3)
     sendEmailAction,
     sendSmsAction,
+    sendWhatsAppTemplateAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,

@@ -83,6 +83,13 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   sms_received: { event: 'sms_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: '+14155551234', message: 'Yes, I am interested. Please call me.' } },
   email_unsubscribed: { event: 'email_unsubscribed', timestamp: NOW, lead: SAMPLE_LEAD, data: { email: 'john@example.com', reason: 'No longer interested' } },
 
+  // -- WhatsApp (AISensy) --
+  whatsapp_sent: { event: 'whatsapp_sent', timestamp: NOW, lead: SAMPLE_LEAD, data: { templateName: 'welcome_offer', messageId: 'wamid.HBgMOTE5OTk5OTk5OTk5FQIAERgS' } },
+  whatsapp_delivered: { event: 'whatsapp_delivered', timestamp: NOW, lead: SAMPLE_LEAD, data: { messageId: 'wamid.HBgMOTE5OTk5OTk5OTk5FQIAERgS' } },
+  whatsapp_read: { event: 'whatsapp_read', timestamp: NOW, lead: SAMPLE_LEAD, data: { messageId: 'wamid.HBgMOTE5OTk5OTk5OTk5FQIAERgS' } },
+  whatsapp_failed: { event: 'whatsapp_failed', timestamp: NOW, lead: SAMPLE_LEAD, data: { messageId: 'wamid.HBgMOTE5OTk5OTk5OTk5FQIAERgS', errorReason: 'Message undeliverable' } },
+  whatsapp_received: { event: 'whatsapp_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: '+919999999999', message: 'Yes, I am interested. Please share the details.' } },
+
 
   // -- Products --
   product_created: { event: 'product_created', timestamp: NOW, lead: null, data: { productId: '550e8400-0000-0000-0000-000000000080', name: 'Pro Plan', price: 99.99, productType: 'service' } },
