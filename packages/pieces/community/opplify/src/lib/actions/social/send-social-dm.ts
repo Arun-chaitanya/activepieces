@@ -1,7 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
-import { buildMessageBody, buttonProps, socialActionCtx, socialTargetProps } from './_shared';
+import { buildMessageBody, buttonProps, socialActionCtx, socialTargetProps, trackLinksProp } from './_shared';
 
 export const sendSocialDmAction = createAction({
   name: 'send_social_dm',
@@ -18,6 +18,7 @@ export const sendSocialDmAction = createAction({
       required: true,
     }),
     ...buttonProps,
+    trackLinks: trackLinksProp,
     quickReplies: Property.Array({
       displayName: 'Quick replies',
       description:
@@ -36,6 +37,8 @@ export const sendSocialDmAction = createAction({
         context.propsValue,
         context.propsValue.quickReplies
       ),
+      trackLinks: context.propsValue.trackLinks === true,
+      flowRunId: context.run.id,
     });
   },
 });

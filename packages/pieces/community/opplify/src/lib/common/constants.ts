@@ -77,6 +77,7 @@ export const SAMPLE_DATA: Record<string, unknown> = {
 
   // -- Activity --
   repeat_visit: { event: 'repeat_visit', timestamp: NOW, lead: SAMPLE_LEAD, data: { visitorId: 'v_abc123', visitNumber: 3 } },
+  link_clicked: { event: 'link_clicked', timestamp: NOW, lead: SAMPLE_LEAD, data: { code: 'a1B2c3D4e5', target_url: 'https://example.com/free-guide', channel: 'instagram', flow_run_id: 'RUNsample00000000000AA' } },
 
   // -- Communication (new inbound) --
   email_received: { event: 'email_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: 'john@example.com', subject: 'Re: Your proposal', body: 'I reviewed the proposal and have some questions.' } },

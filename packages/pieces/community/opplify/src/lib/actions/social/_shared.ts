@@ -27,6 +27,18 @@ export const socialTargetProps = {
   }),
 };
 
+/**
+ * "Track button clicks" (S2.4): the server rewraps button URLs as tracked
+ * short links; clicks land on the lead's timeline, fire the Tracked Link
+ * Clicked trigger, and feed the "Did They Click the Link?" condition.
+ */
+export const trackLinksProp = Property.Checkbox({
+  displayName: 'Track button clicks',
+  description:
+    'Record when this person clicks a button link, so you can see it on their timeline and follow up with people who did not click',
+  required: false,
+});
+
 /** Up to three optional link buttons (Meta caps button DMs at 3). */
 export const buttonProps = {
   button1Label: Property.ShortText({ displayName: 'Button 1 label', description: 'Max 20 characters', required: false }),

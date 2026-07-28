@@ -1,7 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
-import { buildMessageBody, buttonProps, socialActionCtx, socialTargetProps } from './_shared';
+import { buildMessageBody, buttonProps, socialActionCtx, socialTargetProps, trackLinksProp } from './_shared';
 
 export const sendPrivateReplyAction = createAction({
   name: 'send_private_reply',
@@ -18,6 +18,7 @@ export const sendPrivateReplyAction = createAction({
       required: true,
     }),
     ...buttonProps,
+    trackLinks: trackLinksProp,
   },
   async run(context) {
     const client = opplifyClient(await socialActionCtx(context));
@@ -26,6 +27,8 @@ export const sendPrivateReplyAction = createAction({
       communicationId: context.propsValue.communicationId,
       mode: 'private_reply',
       message: buildMessageBody(context.propsValue.text, context.propsValue),
+      trackLinks: context.propsValue.trackLinks === true,
+      flowRunId: context.run.id,
     });
   },
 });

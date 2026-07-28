@@ -3,7 +3,7 @@ import { PieceCategory } from '@activepieces/shared';
 import { opplifyAuth } from './lib/common/auth';
 
 // ============================================================================
-// TRIGGERS (59 total, 10 categories)
+// TRIGGERS (60 total, 10 categories)
 // ============================================================================
 
 // Category 1: Contacts / Leads (10)
@@ -69,8 +69,9 @@ import { taskCreated } from './lib/triggers/tasks/task-created';
 import { taskCompleted } from './lib/triggers/tasks/task-completed';
 import { taskAssigned } from './lib/triggers/tasks/task-assigned';
 
-// Category 8: Activity / Engagement (1)
+// Category 8: Activity / Engagement (2)
 import { repeatVisit } from './lib/triggers/activity/repeat-visit';
+import { linkClicked } from './lib/triggers/activity/link-clicked';
 
 // Category 10: Products (3)
 import { productCreated } from './lib/triggers/products/product-created';
@@ -121,6 +122,7 @@ import { sendSocialDmAction } from './lib/actions/social/send-social-dm';
 import { sendPrivateReplyAction } from './lib/actions/social/send-private-reply';
 import { replyToCommentAction } from './lib/actions/social/reply-to-comment';
 import { reactToMessageAction } from './lib/actions/social/react-to-message';
+import { checkLinkClickedAction } from './lib/actions/social/check-link-clicked';
 
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
@@ -231,6 +233,7 @@ export const opplify = createPiece({
     taskAssigned,
     // Activity / Engagement (1)
     repeatVisit,
+    linkClicked,
     // Products (3)
     productCreated,
     productUpdated,
@@ -265,6 +268,7 @@ export const opplify = createPiece({
     sendPrivateReplyAction,
     replyToCommentAction,
     reactToMessageAction,
+    checkLinkClickedAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,
