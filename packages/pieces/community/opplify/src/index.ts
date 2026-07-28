@@ -124,6 +124,7 @@ import { replyToCommentAction } from './lib/actions/social/reply-to-comment';
 import { reactToMessageAction } from './lib/actions/social/react-to-message';
 import { checkLinkClickedAction } from './lib/actions/social/check-link-clicked';
 import { getInstagramProfileAction } from './lib/actions/social/get-instagram-profile';
+import { smartDelayAction } from './lib/actions/social/smart-delay';
 
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
@@ -271,6 +272,7 @@ export const opplify = createPiece({
     reactToMessageAction,
     checkLinkClickedAction,
     getInstagramProfileAction,
+    smartDelayAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,
