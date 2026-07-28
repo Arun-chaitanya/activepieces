@@ -366,11 +366,71 @@ export const mediaModeDropdown = setupPanel(
   })
 );
 
+interface SocialMediaOption {
+  id: string;
+  caption: string | null;
+  mediaType: string | null;
+  timestamp: string | null;
+}
+
+function mediaOptionLabel(item: SocialMediaOption): string {
+  const date = item.timestamp ? item.timestamp.slice(0, 10) : '';
+  const kind =
+    item.mediaType === 'VIDEO' || item.mediaType === 'REELS'
+      ? 'Reel/Video'
+      : 'Post';
+  const caption = (item.caption || '').replace(/\s+/g, ' ').trim();
+  const excerpt =
+    caption.length > 60 ? `${caption.slice(0, 60)}…` : caption || '(no caption)';
+  return [kind, date, excerpt].filter(Boolean).join(' · ');
+}
+
 export const mediaIdProp = setupPanel(
-  Property.ShortText({
-    displayName: 'Post ID',
+  Property.Dropdown({
+    auth: PieceAuth.None(),
+    displayName: 'Which post exactly',
     description:
-      'The specific post/reel to watch (required when "A specific post or reel" is selected)',
+      'The specific post/reel to watch (used when "A specific post or reel" is selected)',
     required: false,
+    refreshers: ['integrationId'],
+    options: async (propsValue, context) => {
+      const integrationId = propsValue['integrationId'];
+      if (typeof integrationId !== 'string' || integrationId === '') {
+        return {
+          disabled: true,
+          options: [],
+          placeholder: 'Choose a connected account first',
+        };
+      }
+      try {
+        const ctx = await ctxFromProperty(context);
+        const client = opplifyClient(ctx);
+        const result = (await client.getMeta(
+          `social-media?integrationId=${encodeURIComponent(integrationId)}`
+        )) as { media?: SocialMediaOption[]; reason?: string };
+        const media = result.media || [];
+        if (media.length === 0) {
+          return {
+            disabled: true,
+            options: [],
+            placeholder: result.reason || 'No recent posts on this account',
+          };
+        }
+        return {
+          disabled: false,
+          options: media.map((item) => ({
+            label: mediaOptionLabel(item),
+            value: item.id,
+          })),
+        };
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return {
+          disabled: true,
+          options: [],
+          placeholder: 'Error: ' + msg.substring(0, 100),
+        };
+      }
+    },
   })
 );
