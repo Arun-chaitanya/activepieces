@@ -91,6 +91,15 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   whatsapp_received: { event: 'whatsapp_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: '+919999999999', message: 'Yes, I am interested. Please share the details.' } },
 
 
+  // -- Social (Instagram / Facebook) --
+  instagram_dm_received: { event: 'instagram_dm_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'instagram', eventKind: 'dm_received', content: 'Hey! Can you send me the toolkit?', senderExternalId: '17841400000000001', senderUsername: 'jane.creator', providerMessageId: 'mid.sample_dm', integration_id: '550e8400-0000-0000-0000-000000000090' } },
+  instagram_comment_received: { event: 'instagram_comment_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'instagram', eventKind: 'comment_received', content: 'TOOLKIT please!', senderExternalId: '17841400000000001', senderUsername: 'jane.creator', providerMessageId: '17900000000000001', media_id: '17850000000000001', integration_id: '550e8400-0000-0000-0000-000000000090' } },
+  instagram_story_reply_received: { event: 'instagram_story_reply_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'instagram', eventKind: 'story_reply_received', content: 'Love this!', senderExternalId: '17841400000000001', senderUsername: 'jane.creator', providerMessageId: 'mid.sample_story_reply', story_id: '17860000000000001', integration_id: '550e8400-0000-0000-0000-000000000090' } },
+  instagram_mention_received: { event: 'instagram_mention_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'instagram', eventKind: 'mention_received', media_id: '17850000000000002', integration_id: '550e8400-0000-0000-0000-000000000090' } },
+  facebook_dm_received: { event: 'facebook_dm_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'facebook', eventKind: 'dm_received', content: 'Is this still available?', senderExternalId: '7000000000000001', providerMessageId: 'mid.sample_fb_dm', integration_id: '550e8400-0000-0000-0000-000000000091' } },
+  facebook_comment_received: { event: 'facebook_comment_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'facebook', eventKind: 'comment_received', content: 'What is the price?', senderExternalId: '7000000000000001', providerMessageId: '202029053680108_444', media_id: '202029053680108_123', integration_id: '550e8400-0000-0000-0000-000000000091' } },
+
+
   // -- Products --
   product_created: { event: 'product_created', timestamp: NOW, lead: null, data: { productId: '550e8400-0000-0000-0000-000000000080', name: 'Pro Plan', price: 99.99, productType: 'service' } },
   product_updated: { event: 'product_updated', timestamp: NOW, lead: null, data: { productId: '550e8400-0000-0000-0000-000000000080', name: 'Pro Plan', oldPrice: 99.99, newPrice: 129.99 } },

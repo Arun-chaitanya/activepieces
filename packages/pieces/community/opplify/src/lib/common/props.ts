@@ -293,3 +293,77 @@ export const eventTypeDropdown = Property.Dropdown({
     }
   },
 });
+
+// ============================================================================
+// SOCIAL (chat automations — Instagram / Facebook)
+// ============================================================================
+
+export const socialIntegrationDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Connected account',
+  description: 'Only fire for this Instagram/Facebook account (optional)',
+  required: false,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = (await client.getMeta('social-integrations')) as {
+        integrations: Array<{ id: string; name: string; provider_identifier: string }>;
+      };
+      return {
+        disabled: false,
+        options: (result.integrations || []).map((i) => ({
+          label: `${i.name} (${i.provider_identifier === 'instagram' ? 'Instagram' : 'Facebook'})`,
+          value: i.id,
+        })),
+      };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return { disabled: true, options: [], placeholder: 'Error: ' + msg.substring(0, 100) };
+    }
+  },
+});
+
+export const keywordsProp = Property.Array({
+  displayName: 'Keywords',
+  description:
+    'Only fire when the message contains one of these words (leave empty to fire on everything). "#" prefixes and letter case are ignored.',
+  required: false,
+});
+
+export const matchTypeDropdown = Property.StaticDropdown({
+  displayName: 'Keyword matching',
+  description: 'How strictly the keywords must match',
+  required: false,
+  defaultValue: 'contains',
+  options: {
+    options: [
+      { label: 'Message contains the keyword', value: 'contains' },
+      { label: 'Keyword appears as a whole word', value: 'any_word' },
+      { label: 'Message is exactly the keyword', value: 'exact' },
+    ],
+  },
+});
+
+export const mediaModeDropdown = Property.StaticDropdown({
+  displayName: 'Which post or reel',
+  description:
+    '"Next post" arms this automation for whatever you publish next from Opplify',
+  required: false,
+  defaultValue: 'any',
+  options: {
+    options: [
+      { label: 'Any post or reel', value: 'any' },
+      { label: 'A specific post or reel', value: 'specific' },
+      { label: 'My next post or reel', value: 'next' },
+    ],
+  },
+});
+
+export const mediaIdProp = Property.ShortText({
+  displayName: 'Post ID',
+  description:
+    'The specific post/reel to watch (required when "A specific post or reel" is selected)',
+  required: false,
+});

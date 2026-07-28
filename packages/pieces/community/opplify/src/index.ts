@@ -3,7 +3,7 @@ import { PieceCategory } from '@activepieces/shared';
 import { opplifyAuth } from './lib/common/auth';
 
 // ============================================================================
-// TRIGGERS (53 total, 9 categories)
+// TRIGGERS (59 total, 10 categories)
 // ============================================================================
 
 // Category 1: Contacts / Leads (10)
@@ -35,6 +35,14 @@ import { smsSent } from './lib/triggers/communication/sms-sent';
 import { smsDelivered } from './lib/triggers/communication/sms-delivered';
 import { smsFailed } from './lib/triggers/communication/sms-failed';
 import { noteCreated } from './lib/triggers/communication/note-created';
+
+// Category 3b: Social — Instagram / Facebook (6)
+import { instagramDmReceived } from './lib/triggers/social/instagram-dm-received';
+import { instagramCommentReceived } from './lib/triggers/social/instagram-comment-received';
+import { instagramStoryReplyReceived } from './lib/triggers/social/instagram-story-reply-received';
+import { instagramMentionReceived } from './lib/triggers/social/instagram-mention-received';
+import { facebookDmReceived } from './lib/triggers/social/facebook-dm-received';
+import { facebookCommentReceived } from './lib/triggers/social/facebook-comment-received';
 
 // Category 4: Appointments / Scheduling (5)
 import { appointmentBooked } from './lib/triggers/appointments/appointment-booked';
@@ -186,6 +194,14 @@ export const opplify = createPiece({
     whatsappFailed,
     whatsappReceived,
     noteCreated,
+    // Social — Instagram / Facebook (6)
+    instagramDmReceived,
+    instagramCommentReceived,
+    instagramStoryReplyReceived,
+    instagramMentionReceived,
+    facebookDmReceived,
+    facebookCommentReceived,
+
     // Appointments / Scheduling (5)
     appointmentBooked,
     appointmentRescheduled,
