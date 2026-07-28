@@ -116,6 +116,12 @@ import { archiveFunnelAction } from './lib/actions/funnels/archive-funnel';
 // Category 3: Communication (3)
 import { sendEmailAction } from './lib/actions/communication/send-email';
 import { sendSmsAction } from './lib/actions/communication/send-sms';
+// Category 3c: Social actions — Instagram / Facebook (4)
+import { sendSocialDmAction } from './lib/actions/social/send-social-dm';
+import { sendPrivateReplyAction } from './lib/actions/social/send-private-reply';
+import { replyToCommentAction } from './lib/actions/social/reply-to-comment';
+import { reactToMessageAction } from './lib/actions/social/react-to-message';
+
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
 
@@ -254,6 +260,11 @@ export const opplify = createPiece({
     sendEmailAction,
     sendSmsAction,
     sendWhatsAppTemplateAction,
+    // Social — Instagram / Facebook (4)
+    sendSocialDmAction,
+    sendPrivateReplyAction,
+    replyToCommentAction,
+    reactToMessageAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,
