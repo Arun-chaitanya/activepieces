@@ -1,4 +1,5 @@
 import { Property } from '@activepieces/pieces-framework';
+import { setupPanel } from '../../common/setup-panel';
 
 /** Client context builder shared by the social actions. */
 export async function socialActionCtx(context: {
@@ -39,10 +40,18 @@ export const trackLinksProp = Property.Checkbox({
   required: false,
 });
 
-/** Up to three optional link buttons (Meta caps button DMs at 3). */
+/**
+ * Up to three optional link buttons (Meta caps button DMs at 3).
+ * Only button 1 joins the setup panel — the everyday automation has one
+ * button; extra buttons stay a step-settings power feature.
+ */
 export const buttonProps = {
-  button1Label: Property.ShortText({ displayName: 'Button 1 label', description: 'Max 20 characters', required: false }),
-  button1Url: Property.ShortText({ displayName: 'Button 1 link', required: false }),
+  button1Label: setupPanel(
+    Property.ShortText({ displayName: 'Button 1 label', description: 'Max 20 characters', required: false })
+  ),
+  button1Url: setupPanel(
+    Property.ShortText({ displayName: 'Button 1 link', required: false })
+  ),
   button2Label: Property.ShortText({ displayName: 'Button 2 label', description: 'Max 20 characters', required: false }),
   button2Url: Property.ShortText({ displayName: 'Button 2 link', required: false }),
   button3Label: Property.ShortText({ displayName: 'Button 3 label', description: 'Max 20 characters', required: false }),

@@ -1,6 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
+import { setupPanel } from '../../common/setup-panel';
 import { buildMessageBody, buttonProps, socialActionCtx, socialTargetProps, trackLinksProp } from './_shared';
 
 export const sendSocialDmAction = createAction({
@@ -12,19 +13,23 @@ export const sendSocialDmAction = createAction({
   requireAuth: true,
   props: {
     ...socialTargetProps,
-    text: Property.LongText({
-      displayName: 'Message',
-      description: 'What to say',
-      required: true,
-    }),
+    text: setupPanel(
+      Property.LongText({
+        displayName: 'Message',
+        description: 'What to say',
+        required: true,
+      })
+    ),
     ...buttonProps,
     trackLinks: trackLinksProp,
-    quickReplies: Property.Array({
-      displayName: 'Quick replies',
-      description:
-        'Tappable answer chips shown under the message (used only when no buttons are set; max 13, 20 characters each)',
-      required: false,
-    }),
+    quickReplies: setupPanel(
+      Property.Array({
+        displayName: 'Quick replies',
+        description:
+          'Tappable answer chips shown under the message (used only when no buttons are set; max 13, 20 characters each)',
+        required: false,
+      })
+    ),
   },
   async run(context) {
     const client = opplifyClient(await socialActionCtx(context));

@@ -2,6 +2,7 @@ import { createAction, Property } from '@activepieces/pieces-framework';
 import { ExecutionType, PauseType } from '@activepieces/shared';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
+import { setupPanel } from '../../common/setup-panel';
 import { socialActionCtx } from './_shared';
 
 export const smartDelayAction = createAction({
@@ -16,23 +17,27 @@ export const smartDelayAction = createAction({
     retryOnFailure: { hide: true },
   },
   props: {
-    amount: Property.Number({
-      displayName: 'Wait for',
-      description: 'How long to wait (e.g. 20)',
-      required: true,
-    }),
-    unit: Property.StaticDropdown({
-      displayName: 'Unit',
-      required: true,
-      defaultValue: 'hours',
-      options: {
-        options: [
-          { label: 'Minutes', value: 'minutes' },
-          { label: 'Hours', value: 'hours' },
-          { label: 'Days', value: 'days' },
-        ],
-      },
-    }),
+    amount: setupPanel(
+      Property.Number({
+        displayName: 'Wait for',
+        description: 'How long to wait (e.g. 20)',
+        required: true,
+      })
+    ),
+    unit: setupPanel(
+      Property.StaticDropdown({
+        displayName: 'Unit',
+        required: true,
+        defaultValue: 'hours',
+        options: {
+          options: [
+            { label: 'Minutes', value: 'minutes' },
+            { label: 'Hours', value: 'hours' },
+            { label: 'Days', value: 'days' },
+          ],
+        },
+      })
+    ),
   },
   async run(context) {
     if (context.executionType === ExecutionType.RESUME) {

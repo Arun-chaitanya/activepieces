@@ -1,6 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
+import { setupPanel } from '../../common/setup-panel';
 import { socialActionCtx, socialTargetProps } from './_shared';
 
 export const replyToCommentAction = createAction({
@@ -12,11 +13,13 @@ export const replyToCommentAction = createAction({
   requireAuth: true,
   props: {
     ...socialTargetProps,
-    text: Property.LongText({
-      displayName: 'Reply',
-      description: 'The public reply text',
-      required: true,
-    }),
+    text: setupPanel(
+      Property.LongText({
+        displayName: 'Reply',
+        description: 'The public reply text',
+        required: true,
+      })
+    ),
   },
   async run(context) {
     const client = opplifyClient(await socialActionCtx(context));

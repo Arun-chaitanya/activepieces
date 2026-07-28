@@ -1,6 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
+import { setupPanel } from '../../common/setup-panel';
 import { buildMessageBody, buttonProps, socialActionCtx, socialTargetProps, trackLinksProp } from './_shared';
 
 export const sendPrivateReplyAction = createAction({
@@ -12,11 +13,13 @@ export const sendPrivateReplyAction = createAction({
   requireAuth: true,
   props: {
     ...socialTargetProps,
-    text: Property.LongText({
-      displayName: 'Message',
-      description: 'What to DM the commenter',
-      required: true,
-    }),
+    text: setupPanel(
+      Property.LongText({
+        displayName: 'Message',
+        description: 'What to DM the commenter',
+        required: true,
+      })
+    ),
     ...buttonProps,
     trackLinks: trackLinksProp,
   },

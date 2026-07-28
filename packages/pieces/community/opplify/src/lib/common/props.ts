@@ -1,5 +1,6 @@
 import { PieceAuth, Property } from '@activepieces/pieces-framework';
 import { opplifyClient } from './client';
+import { setupPanel } from './setup-panel';
 
 const BASE_URL = process.env['AP_OPPLIFY_BASE_URL'] || 'http://host.docker.internal:3001';
 
@@ -325,12 +326,14 @@ export const socialIntegrationDropdown = Property.Dropdown({
   },
 });
 
-export const keywordsProp = Property.Array({
-  displayName: 'Keywords',
-  description:
-    'Only fire when the message contains one of these words (leave empty to fire on everything). "#" prefixes and letter case are ignored.',
-  required: false,
-});
+export const keywordsProp = setupPanel(
+  Property.Array({
+    displayName: 'Keywords',
+    description:
+      'Only fire when the message contains one of these words (leave empty to fire on everything). "#" prefixes and letter case are ignored.',
+    required: false,
+  })
+);
 
 export const matchTypeDropdown = Property.StaticDropdown({
   displayName: 'Keyword matching',
@@ -346,24 +349,28 @@ export const matchTypeDropdown = Property.StaticDropdown({
   },
 });
 
-export const mediaModeDropdown = Property.StaticDropdown({
-  displayName: 'Which post or reel',
-  description:
-    '"Next post" arms this automation for whatever you publish next from Opplify',
-  required: false,
-  defaultValue: 'any',
-  options: {
-    options: [
-      { label: 'Any post or reel', value: 'any' },
-      { label: 'A specific post or reel', value: 'specific' },
-      { label: 'My next post or reel', value: 'next' },
-    ],
-  },
-});
+export const mediaModeDropdown = setupPanel(
+  Property.StaticDropdown({
+    displayName: 'Which post or reel',
+    description:
+      '"Next post" arms this automation for whatever you publish next from Opplify',
+    required: false,
+    defaultValue: 'any',
+    options: {
+      options: [
+        { label: 'Any post or reel', value: 'any' },
+        { label: 'A specific post or reel', value: 'specific' },
+        { label: 'My next post or reel', value: 'next' },
+      ],
+    },
+  })
+);
 
-export const mediaIdProp = Property.ShortText({
-  displayName: 'Post ID',
-  description:
-    'The specific post/reel to watch (required when "A specific post or reel" is selected)',
-  required: false,
-});
+export const mediaIdProp = setupPanel(
+  Property.ShortText({
+    displayName: 'Post ID',
+    description:
+      'The specific post/reel to watch (required when "A specific post or reel" is selected)',
+    required: false,
+  })
+);
