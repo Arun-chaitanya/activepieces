@@ -128,6 +128,7 @@ import { getInstagramProfileAction } from './lib/actions/social/get-instagram-pr
 import { smartDelayAction } from './lib/actions/social/smart-delay';
 import { subscribeToSequenceAction } from './lib/actions/social/subscribe-to-sequence';
 import { unsubscribeFromSequenceAction } from './lib/actions/social/unsubscribe-from-sequence';
+import { notifyAdminAction } from './lib/actions/social/notify-admin';
 
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
@@ -279,6 +280,7 @@ export const opplify = createPiece({
     smartDelayAction,
     subscribeToSequenceAction,
     unsubscribeFromSequenceAction,
+    notifyAdminAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,
