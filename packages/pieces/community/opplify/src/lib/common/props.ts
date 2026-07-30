@@ -434,3 +434,55 @@ export const mediaIdProp = setupPanel(
     },
   })
 );
+
+interface SequenceOption {
+  id: string;
+  name: string;
+}
+
+/**
+ * The company's LIVE drip sequences (S5.1) — flows whose "Sequence Started"
+ * trigger is published. Enrolling into an unpublished sequence goes nowhere,
+ * so drafts are deliberately absent.
+ */
+export const sequenceDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Sequence',
+  description: 'Which message series to use (only published sequences appear)',
+  required: true,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = (await client.getMeta('sequences')) as {
+        sequences?: SequenceOption[];
+        reason?: string;
+      };
+      const sequences = result.sequences || [];
+      if (sequences.length === 0) {
+        return {
+          disabled: true,
+          options: [],
+          placeholder:
+            result.reason ||
+            'No published sequences yet — build a flow starting with "Sequence Started" and publish it',
+        };
+      }
+      return {
+        disabled: false,
+        options: sequences.map((sequence) => ({
+          label: sequence.name,
+          value: sequence.id,
+        })),
+      };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return {
+        disabled: true,
+        options: [],
+        placeholder: 'Error: ' + msg.substring(0, 100),
+      };
+    }
+  },
+});

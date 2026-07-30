@@ -42,6 +42,7 @@ import { instagramCommentReceived } from './lib/triggers/social/instagram-commen
 import { instagramStoryReplyReceived } from './lib/triggers/social/instagram-story-reply-received';
 import { instagramMentionReceived } from './lib/triggers/social/instagram-mention-received';
 import { facebookDmReceived } from './lib/triggers/social/facebook-dm-received';
+import { sequenceSubscribed } from './lib/triggers/social/sequence-subscribed';
 import { facebookCommentReceived } from './lib/triggers/social/facebook-comment-received';
 
 // Category 4: Appointments / Scheduling (5)
@@ -125,6 +126,8 @@ import { reactToMessageAction } from './lib/actions/social/react-to-message';
 import { checkLinkClickedAction } from './lib/actions/social/check-link-clicked';
 import { getInstagramProfileAction } from './lib/actions/social/get-instagram-profile';
 import { smartDelayAction } from './lib/actions/social/smart-delay';
+import { subscribeToSequenceAction } from './lib/actions/social/subscribe-to-sequence';
+import { unsubscribeFromSequenceAction } from './lib/actions/social/unsubscribe-from-sequence';
 
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
@@ -211,6 +214,7 @@ export const opplify = createPiece({
     instagramMentionReceived,
     facebookDmReceived,
     facebookCommentReceived,
+    sequenceSubscribed,
 
     // Appointments / Scheduling (5)
     appointmentBooked,
@@ -273,6 +277,8 @@ export const opplify = createPiece({
     checkLinkClickedAction,
     getInstagramProfileAction,
     smartDelayAction,
+    subscribeToSequenceAction,
+    unsubscribeFromSequenceAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,

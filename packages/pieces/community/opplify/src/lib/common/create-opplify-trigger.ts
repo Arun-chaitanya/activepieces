@@ -21,6 +21,13 @@ interface OpplifyTriggerConfig {
    * funnelId / websiteId props would silently produce no matches.
    */
   sourceType?: OpplifySourceType;
+  /**
+   * S5.1 sequences: the trigger subscribes with a `sequenceFlowId` filter set
+   * to ITS OWN flow id, so only enrollments into this exact sequence start a
+   * run — the subscribe verb dispatches one `sequence_subscribed` event per
+   * enrollment and every other sequence's trigger ignores it.
+   */
+  scopeToOwnFlow?: boolean;
 }
 
 function buildFilters(
@@ -71,15 +78,19 @@ export function createOpplifyTrigger(config: OpplifyTriggerConfig) {
     async onEnable(context) {
       const ctx = await getClientContext(context);
       const client = opplifyClient(ctx);
+      const filters = buildFilters(
+        context.propsValue as Record<string, unknown>,
+        config.sourceType
+      );
+      if (config.scopeToOwnFlow) {
+        filters['sequenceFlowId'] = context.flows.current.id;
+      }
       const subscriptionId = await client.subscribe({
         eventType: config.eventType,
         webhookUrl: context.webhookUrl,
         flowId: context.flows.current.id,
         triggerName: config.name,
-        filters: buildFilters(
-          context.propsValue as Record<string, unknown>,
-          config.sourceType
-        ),
+        filters,
       });
       await context.store.put('subscriptionId', subscriptionId);
     },

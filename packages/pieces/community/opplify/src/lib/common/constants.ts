@@ -99,6 +99,7 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   instagram_mention_received: { event: 'instagram_mention_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'instagram', eventKind: 'mention_received', media_id: '17850000000000002', integration_id: '550e8400-0000-0000-0000-000000000090' } },
   facebook_dm_received: { event: 'facebook_dm_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'facebook', eventKind: 'dm_received', content: 'Is this still available?', senderExternalId: '7000000000000001', providerMessageId: 'mid.sample_fb_dm', integration_id: '550e8400-0000-0000-0000-000000000091' } },
   facebook_comment_received: { event: 'facebook_comment_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { channel: 'facebook', eventKind: 'comment_received', content: 'What is the price?', senderExternalId: '7000000000000001', providerMessageId: '202029053680108_444', media_id: '202029053680108_123', integration_id: '550e8400-0000-0000-0000-000000000091' } },
+  sequence_subscribed: { event: 'sequence_subscribed', timestamp: NOW, lead: SAMPLE_LEAD, data: { sequenceFlowId: 'AbCdEf1234567890AbCdE', subscription_id: '550e8400-0000-0000-0000-0000000000a1', communication_id: '550e8400-0000-0000-0000-0000000000a2', channel: 'instagram', integration_id: '550e8400-0000-0000-0000-000000000090', exit_on_reply: true } },
 
 
   // -- Products --

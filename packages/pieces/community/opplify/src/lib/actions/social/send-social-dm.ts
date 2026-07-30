@@ -30,6 +30,15 @@ export const sendSocialDmAction = createAction({
         required: false,
       })
     ),
+    skipIfWindowClosed: Property.Checkbox({
+      displayName: 'Skip if the reply window has closed',
+      description:
+        'Instagram/Facebook only deliver DMs within 24 hours of the person\'s last message. ' +
+        'On: a closed window SKIPS this message and the automation continues — turn this on for ' +
+        'every send inside a sequence. Off: a closed window fails this step.',
+      required: false,
+      defaultValue: false,
+    }),
   },
   async run(context) {
     const client = opplifyClient(await socialActionCtx(context));
@@ -44,6 +53,7 @@ export const sendSocialDmAction = createAction({
       ),
       trackLinks: context.propsValue.trackLinks === true,
       flowRunId: context.run.id,
+      skipIfWindowClosed: context.propsValue.skipIfWindowClosed === true,
     });
   },
 });
