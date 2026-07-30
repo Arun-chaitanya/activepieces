@@ -129,6 +129,7 @@ import { smartDelayAction } from './lib/actions/social/smart-delay';
 import { subscribeToSequenceAction } from './lib/actions/social/subscribe-to-sequence';
 import { unsubscribeFromSequenceAction } from './lib/actions/social/unsubscribe-from-sequence';
 import { notifyAdminAction } from './lib/actions/social/notify-admin';
+import { captureEmailAction } from './lib/actions/contacts/capture-email';
 
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
@@ -281,6 +282,7 @@ export const opplify = createPiece({
     subscribeToSequenceAction,
     unsubscribeFromSequenceAction,
     notifyAdminAction,
+    captureEmailAction,
     createNoteAction,
     // Appointments (5)
     createAppointmentAction,

@@ -486,3 +486,32 @@ export const sequenceDropdown = Property.Dropdown({
     }
   },
 });
+
+/**
+ * AI intent routing (S6.4): a DM trigger can declare a business intent so
+ * messages that MEAN it (no keyword needed) route to this automation.
+ * Classification runs in the Opplify worker, never in piece code.
+ */
+export const intentProp = setupPanel(
+  Property.ShortText({
+    displayName: 'AI intent (optional, no keywords needed)',
+    description:
+      "A short intent id like 'pricing_question'. When a DM matches this MEANING and no keyword automation claimed it, this automation runs. Leave empty for keyword-only matching.",
+    required: false,
+  })
+);
+
+export const intentDescriptionProp = Property.LongText({
+  displayName: 'What counts as this intent',
+  description:
+    'Teach the AI what belongs here, e.g. "Questions about price, cost, plans, discounts, how much things are".',
+  required: false,
+});
+
+/** Email capture (S6.2): gate a DM trigger to email-attempt messages. */
+export const requireEmailInMessageProp = Property.Checkbox({
+  displayName: 'Only when the message contains an email address',
+  description:
+    'On: fires only for messages that look like an email attempt (even a mistyped one — pair with a Router on the Capture Email step to ask again). The heart of an email-capture automation.',
+  required: false,
+});

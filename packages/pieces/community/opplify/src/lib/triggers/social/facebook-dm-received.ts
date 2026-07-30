@@ -1,6 +1,9 @@
 import { createOpplifyTrigger } from '../../common/create-opplify-trigger';
 import { SAMPLE_DATA } from '../../common/constants';
 import {
+  intentDescriptionProp,
+  intentProp,
+  requireEmailInMessageProp,
   keywordsProp,
   matchTypeDropdown,
   socialIntegrationDropdown,
@@ -16,6 +19,9 @@ export const facebookDmReceived = createOpplifyTrigger({
     integrationId: socialIntegrationDropdown,
     keywords: keywordsProp,
     matchType: matchTypeDropdown,
+    intent: intentProp,
+    intentDescription: intentDescriptionProp,
+    requireEmailInMessage: requireEmailInMessageProp,
   },
   sampleData: SAMPLE_DATA.facebook_dm_received,
 });
