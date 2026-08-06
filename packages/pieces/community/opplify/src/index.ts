@@ -134,6 +134,9 @@ import { captureEmailAction } from './lib/actions/contacts/capture-email';
 import { sendWhatsAppTemplateAction } from './lib/actions/communication/send-whatsapp-template';
 import { createNoteAction } from './lib/actions/communication/create-note';
 
+// Zoom (1)
+import { registerZoomLeadAction } from './lib/actions/zoom/register-lead';
+
 // Category 4: Appointments (5)
 import { createAppointmentAction } from './lib/actions/appointments/create-appointment';
 import { cancelAppointmentAction } from './lib/actions/appointments/cancel-appointment';
@@ -284,6 +287,8 @@ export const opplify = createPiece({
     notifyAdminAction,
     captureEmailAction,
     createNoteAction,
+    // Zoom (1)
+    registerZoomLeadAction,
     // Appointments (5)
     createAppointmentAction,
     cancelAppointmentAction,

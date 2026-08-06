@@ -171,6 +171,27 @@ export const funnelIdDropdown = Property.Dropdown({
   },
 });
 
+export const websiteIdDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Website',
+  description: 'Filter by website (optional)',
+  required: false,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('websites') as { websites: Array<{ id: string; name: string }> };
+      return {
+        disabled: false,
+        options: (result.websites || []).map((w) => ({ label: w.name, value: w.id })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load websites' };
+    }
+  },
+});
+
 export const funnelActionDropdown = Property.StaticDropdown({
   displayName: 'Action',
   description: 'Filter by specific funnel action (optional)',
@@ -279,6 +300,52 @@ export const eventTypeDropdown = Property.Dropdown({
   displayName: 'Event Type',
   description: 'Select an event type for scheduling',
   required: true,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('event-types') as { eventTypes: Array<{ id: string; title: string }> };
+      return {
+        disabled: false,
+        options: (result.eventTypes || []).map((e) => ({ label: e.title, value: e.id })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load event types' };
+    }
+  },
+});
+
+export const zoomHostDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Zoom Host',
+  description:
+    'Teammate whose Zoom account performs the registration (optional — defaults to the meeting\'s bound host, then the company\'s Zoom connection)',
+  required: false,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('users') as { users: Array<{ id: string; fullName: string; email: string }> };
+      return {
+        disabled: false,
+        options: (result.users || []).map((u) => ({
+          label: u.fullName || u.email,
+          value: u.id,
+        })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load team members' };
+    }
+  },
+});
+
+export const eventTypeFilterDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Event Type',
+  description: 'Filter by scheduling event type (optional)',
+  required: false,
   refreshers: [],
   options: async (_propsValue, context) => {
     try {

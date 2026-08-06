@@ -30,6 +30,18 @@ interface OpplifyTriggerConfig {
   scopeToOwnFlow?: boolean;
 }
 
+/**
+ * Surface-scoping props (D8): whichever of these a trigger exposes maps onto
+ * the polymorphic {sourceType, sourceId} pair the dispatcher matches on. A
+ * trigger may offer several (Funnel AND Website dropdowns) — the user picks
+ * at most one. Every other prop name (formId, eventTypeId, …) passes through
+ * verbatim and is matched against the event payload directly.
+ */
+const SURFACE_ID_PROPS: Record<string, OpplifySourceType> = {
+  funnelId: 'funnel',
+  websiteId: 'website',
+};
+
 function buildFilters(
   propsValue: Record<string, unknown>,
   sourceType?: OpplifySourceType
@@ -41,15 +53,30 @@ function buildFilters(
     filters[key] = value;
   }
 
-  // Translate `<sourceType>Id` (funnelId, websiteId, …) into the polymorphic
-  // pair the dispatcher actually matches on. Subscriptions that omit the id
-  // prop stay unscoped — every event of this type fires.
-  if (sourceType) {
+  // Translate surface id props into the polymorphic pair. Subscriptions that
+  // omit every surface prop stay surface-unscoped — every event of this type
+  // fires (other pass-through filters like formId still apply).
+  const surfaceKeys = Object.keys(SURFACE_ID_PROPS).filter(
+    (key) => filters[key] !== undefined
+  );
+  if (surfaceKeys.length > 1) {
+    throw new Error(
+      'Pick at most one surface filter (Funnel OR Website) — a flow can only be scoped to a single surface.'
+    );
+  }
+  const surfaceKey = surfaceKeys[0];
+  if (surfaceKey) {
+    filters['sourceType'] = SURFACE_ID_PROPS[surfaceKey];
+    filters['sourceId'] = filters[surfaceKey];
+    delete filters[surfaceKey];
+  } else if (sourceType && !(sourceType in { funnel: 1, website: 1 })) {
+    // Legacy path for non-surface sourceTypes: `<sourceType>Id` rewrites to
+    // the pair (no trigger uses this today; funnel/website are handled above).
     const idKey = `${sourceType}Id`;
     const idValue = filters[idKey];
     if (idValue !== undefined) {
-      filters.sourceType = sourceType;
-      filters.sourceId = idValue;
+      filters['sourceType'] = sourceType;
+      filters['sourceId'] = idValue;
       delete filters[idKey];
     }
   }
