@@ -18,6 +18,7 @@ import { tagRemoved } from './lib/triggers/contacts/tag-removed';
 import { customFieldChanged } from './lib/triggers/contacts/custom-field-changed';
 import { leadDeleted } from './lib/triggers/contacts/lead-deleted';
 import { leadMatchesCriteria } from './lib/triggers/contacts/lead-matches-criteria';
+import { datePropertyReached } from './lib/triggers/contacts/date-property-reached';
 
 // Category 2: Funnels, Pages & Forms (4)
 import { funnelCreated } from './lib/triggers/funnels/funnel-created';
@@ -128,6 +129,8 @@ import { reactToMessageAction } from './lib/actions/social/react-to-message';
 import { checkLinkClickedAction } from './lib/actions/social/check-link-clicked';
 import { getInstagramProfileAction } from './lib/actions/social/get-instagram-profile';
 import { smartDelayAction } from './lib/actions/social/smart-delay';
+import { waitUntilAction } from './lib/actions/timing/wait-until';
+import { waitBusinessTimeAction } from './lib/actions/timing/wait-business-time';
 import { subscribeToSequenceAction } from './lib/actions/social/subscribe-to-sequence';
 import { unsubscribeFromSequenceAction } from './lib/actions/social/unsubscribe-from-sequence';
 import { notifyAdminAction } from './lib/actions/social/notify-admin';
@@ -191,6 +194,7 @@ export const opplify = createPiece({
     customFieldChanged,
     leadDeleted,
     leadMatchesCriteria,
+    datePropertyReached,
     // Funnels, Pages & Forms (4)
     funnelCreated,
     funnelActivity,
@@ -286,6 +290,8 @@ export const opplify = createPiece({
     checkLinkClickedAction,
     getInstagramProfileAction,
     smartDelayAction,
+    waitUntilAction,
+    waitBusinessTimeAction,
     subscribeToSequenceAction,
     unsubscribeFromSequenceAction,
     notifyAdminAction,
