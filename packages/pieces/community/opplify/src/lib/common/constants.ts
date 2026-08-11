@@ -31,6 +31,8 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   tag_removed: { event: 'tag_removed', timestamp: NOW, lead: SAMPLE_LEAD, data: { tagName: 'cold-lead', removedBy: 'user' } },
   custom_field_changed: { event: 'custom_field_changed', timestamp: NOW, lead: SAMPLE_LEAD, data: { fieldName: 'budget', oldValue: null, newValue: '50000' } },
   lead_deleted: { event: 'lead_deleted', timestamp: NOW, lead: null, data: { email: 'deleted@example.com', deletedBy: '550e8400-0000-0000-0000-000000000003' } },
+  lead_matches_criteria: { event: 'lead_matches_criteria', timestamp: NOW, lead: SAMPLE_LEAD, data: {} },
+  date_property_reached: { event: 'date_property_reached', timestamp: NOW, lead: SAMPLE_LEAD, data: { fieldName: 'custom.renewal_date', offsetDays: 3, direction: 'before', atHour: 9, targetDate: '2026-08-14' } },
 
   // -- Funnels, Pages & Forms --
   funnel_created: { event: 'funnel_created', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', name: 'Sales Landing Page', funnelType: 'salesFunnel' } },

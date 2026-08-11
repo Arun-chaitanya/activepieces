@@ -17,6 +17,7 @@ import { tagAdded } from './lib/triggers/contacts/tag-added';
 import { tagRemoved } from './lib/triggers/contacts/tag-removed';
 import { customFieldChanged } from './lib/triggers/contacts/custom-field-changed';
 import { leadDeleted } from './lib/triggers/contacts/lead-deleted';
+import { leadMatchesCriteria } from './lib/triggers/contacts/lead-matches-criteria';
 
 // Category 2: Funnels, Pages & Forms (4)
 import { funnelCreated } from './lib/triggers/funnels/funnel-created';
@@ -189,6 +190,7 @@ export const opplify = createPiece({
     tagRemoved,
     customFieldChanged,
     leadDeleted,
+    leadMatchesCriteria,
     // Funnels, Pages & Forms (4)
     funnelCreated,
     funnelActivity,
