@@ -170,7 +170,7 @@ export const opplify = createPiece({
     'AI-powered sales funnel & CRM platform. ' +
     'Triggers for leads, forms, funnels, appointments, deals, communications, tasks, and orders. ' +
     'Actions to create and manage all CRM entities.',
-  logoUrl: 'https://cdn.getopplify.com/logo-piece.png',
+  logoUrl: 'https://app.getopplify.com/opplify-icon-512.png',
   minimumSupportedRelease: '0.36.1',
   categories: [PieceCategory.SALES_AND_CRM, PieceCategory.MARKETING],
   authors: ['getopplify'],
