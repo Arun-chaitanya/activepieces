@@ -106,6 +106,7 @@ import { assignLeadAction } from './lib/actions/contacts/assign-lead';
 import { addTagAction } from './lib/actions/contacts/add-tag';
 import { removeTagAction } from './lib/actions/contacts/remove-tag';
 import { setCustomFieldAction } from './lib/actions/contacts/set-custom-field';
+import { editLeadAction } from './lib/actions/contacts/edit-lead';
 import { setDndAction } from './lib/actions/contacts/set-dnd';
 import { deleteLeadAction } from './lib/actions/contacts/delete-lead';
 
@@ -263,6 +264,7 @@ export const opplify = createPiece({
     addTagAction,
     removeTagAction,
     setCustomFieldAction,
+    editLeadAction,
     setDndAction,
     deleteLeadAction,
     // Funnels (4)
