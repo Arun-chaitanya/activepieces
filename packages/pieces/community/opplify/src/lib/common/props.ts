@@ -582,3 +582,67 @@ export const requireEmailInMessageProp = Property.Checkbox({
     'On: fires only for messages that look like an email attempt (even a mistyped one — pair with a Router on the Capture Email step to ask again). The heart of an email-capture automation.',
   required: false,
 });
+
+// ============================================================================
+// DATE-PROPERTY TRIGGER PROPS (parity S5.2)
+// ============================================================================
+
+/**
+ * The date-typed subset of the lead fields (fixed columns + custom date
+ * fields), for the "N days before/after a date" trigger.
+ */
+export const dateFieldDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Which date field',
+  description:
+    "The lead's date field to watch — for example a Renewal Date custom field, or Created.",
+  required: true,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = (await client.getMeta('lead-fields')) as {
+        fields: Array<{ key: string; label: string; type: string }>;
+      };
+      const options = (result.fields || [])
+        .filter((field) => field.type === 'date')
+        .map((field) => ({ label: field.label, value: field.key }));
+      if (options.length === 0) {
+        return {
+          disabled: true,
+          options: [],
+          placeholder:
+            'No date fields yet — add a date custom field to your leads first',
+        };
+      }
+      return { disabled: false, options };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load date fields' };
+    }
+  },
+});
+
+export const dateDirectionDropdown = Property.StaticDropdown({
+  displayName: 'Before or after that date',
+  required: true,
+  options: {
+    options: [
+      { label: 'Before the date (e.g. a reminder ahead of a renewal)', value: 'before' },
+      { label: 'After the date (e.g. a follow-up once it has passed)', value: 'after' },
+    ],
+  },
+});
+
+export const atHourDropdown = Property.StaticDropdown({
+  displayName: 'At what time of day',
+  description: "In your company's timezone.",
+  required: true,
+  defaultValue: 9,
+  options: {
+    options: Array.from({ length: 24 }, (_, hour) => ({
+      label: `${String(hour).padStart(2, '0')}:00`,
+      value: hour,
+    })),
+  },
+});
