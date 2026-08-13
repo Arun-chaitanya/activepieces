@@ -81,6 +81,12 @@ import { productCreated } from './lib/triggers/products/product-created';
 import { productUpdated } from './lib/triggers/products/product-updated';
 import { productArchived } from './lib/triggers/products/product-archived';
 
+// Category 11: Zoom (4)
+import { zoomRegistered } from './lib/triggers/zoom/registered';
+import { zoomJoined } from './lib/triggers/zoom/joined';
+import { zoomAttended } from './lib/triggers/zoom/attended';
+import { zoomNoShow } from './lib/triggers/zoom/no-show';
+
 // Category 3 additions: Inbound Communication (3)
 import { emailReceived } from './lib/triggers/communication/email-received';
 import { smsReceived } from './lib/triggers/communication/sms-received';
@@ -256,6 +262,11 @@ export const opplify = createPiece({
     productCreated,
     productUpdated,
     productArchived,
+    // Zoom (4)
+    zoomRegistered,
+    zoomJoined,
+    zoomAttended,
+    zoomNoShow,
   ],
 
   actions: [

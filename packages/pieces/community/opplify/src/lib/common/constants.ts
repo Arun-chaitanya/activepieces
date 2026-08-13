@@ -61,6 +61,12 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   appointment_completed: { event: 'appointment_completed', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030' } },
   appointment_no_show: { event: 'appointment_no_show', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030' } },
 
+  // -- Zoom (keys mirror the REAL dispatched payloads in src/lib/integrations/zoom/) --
+  zoom_registered: { event: 'zoom_registered', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', joinUrl: 'https://zoom.us/w/81931356157?tk=abc123', registrantId: 'reg_abc123' } },
+  zoom_joined: { event: 'zoom_joined', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting' } },
+  zoom_attended: { event: 'zoom_attended', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', durationMinutes: 42, attendancePercentage: 70.5, pollsAnswered: 2, questionsAsked: 1 } },
+  zoom_no_show: { event: 'zoom_no_show', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', durationMinutes: 0, attendancePercentage: null, pollsAnswered: 0, questionsAsked: 0 } },
+
   // -- Deals --
   deal_created: { event: 'deal_created', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', stage: 'discovery', amount: 5000, title: 'Enterprise Plan' } },
   deal_stage_changed: { event: 'deal_stage_changed', timestamp: NOW, lead: SAMPLE_LEAD, data: { dealId: '550e8400-0000-0000-0000-000000000040', oldStage: 'discovery', newStage: 'proposal' } },

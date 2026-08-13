@@ -347,6 +347,33 @@ export const zoomMeetingDropdown = Property.Dropdown({
   },
 });
 
+export const zoomMeetingFilterDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Meeting/Webinar (optional filter)',
+  description:
+    'Only fire for this Zoom event. Leave empty to fire for every meeting/webinar.',
+  required: false,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('zoom-meetings') as {
+        meetings: Array<{ id: string; topic: string; startTime: string | null; kind: string }>;
+      };
+      return {
+        disabled: false,
+        options: (result.meetings || []).map((m) => ({
+          label: `${m.topic || m.id} (${m.kind}${m.startTime ? `, ${m.startTime.slice(0, 10)}` : ''})`,
+          value: m.id,
+        })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load Zoom events' };
+    }
+  },
+});
+
 export const zoomHostDropdown = Property.Dropdown({
   auth: PieceAuth.None(),
   displayName: 'Zoom Host',
