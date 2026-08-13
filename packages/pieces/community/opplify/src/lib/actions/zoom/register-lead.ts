@@ -1,7 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
-import { zoomHostDropdown } from '../../common/props';
+import { zoomHostDropdown, zoomMeetingDropdown } from '../../common/props';
 
 export const registerZoomLeadAction = createAction({
   name: 'zoom_register_lead',
@@ -16,12 +16,7 @@ export const registerZoomLeadAction = createAction({
       description: 'The ID of the lead to register (e.g. {{trigger.lead.id}})',
       required: true,
     }),
-    meetingId: Property.ShortText({
-      displayName: 'Meeting/Webinar ID',
-      description:
-        'Numeric Zoom event id — map it from the trigger, e.g. {{trigger.data.formAnswers.meeting}}',
-      required: true,
-    }),
+    meetingId: zoomMeetingDropdown,
     eventKind: Property.StaticDropdown({
       displayName: 'Event Kind',
       description:

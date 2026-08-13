@@ -316,6 +316,37 @@ export const eventTypeDropdown = Property.Dropdown({
   },
 });
 
+export const zoomMeetingDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Meeting/Webinar',
+  description:
+    'Upcoming Zoom webinars and scheduled meetings across the company\'s connected accounts. For multi-event forms, toggle to a dynamic value and map the form answer instead, e.g. {{trigger.data.formAnswers.which_session}} (the field\'s option values must be numeric Zoom event ids).',
+  required: true,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('zoom-meetings') as {
+        meetings: Array<{ id: string; topic: string; startTime: string | null; kind: string; hostName: string }>;
+      };
+      const meetings = result.meetings || [];
+      if (meetings.length === 0) {
+        return { disabled: true, options: [], placeholder: 'No upcoming Zoom events — connect Zoom or schedule one' };
+      }
+      return {
+        disabled: false,
+        options: meetings.map((m) => ({
+          label: `${m.topic || m.id} (${m.kind}${m.startTime ? `, ${m.startTime.slice(0, 10)}` : ''})`,
+          value: m.id,
+        })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load Zoom events' };
+    }
+  },
+});
+
 export const zoomHostDropdown = Property.Dropdown({
   auth: PieceAuth.None(),
   displayName: 'Zoom Host',

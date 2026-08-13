@@ -37,7 +37,9 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   // -- Funnels, Pages & Forms --
   funnel_created: { event: 'funnel_created', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', name: 'Sales Landing Page', funnelType: 'salesFunnel' } },
   funnel_activity: { event: 'funnel_activity', timestamp: NOW, lead: null, data: { funnelId: '550e8400-0000-0000-0000-000000000010', action: 'published' } },
-  form_submitted: { event: 'form_submitted', timestamp: NOW, lead: SAMPLE_LEAD, data: { formId: '550e8400-0000-0000-0000-000000000020', funnelId: '550e8400-0000-0000-0000-000000000010', formName: 'Contact Form', submissionData: { name: 'Jane Smith', email: 'jane@example.com', message: 'Interested' } } },
+  // Keys mirror the REAL dispatched payload (onFormSubmitted in tag-rules-hooks.ts):
+  // answers live under data.formAnswers keyed by field name — NOT submissionData.
+  form_submitted: { event: 'form_submitted', timestamp: NOW, lead: SAMPLE_LEAD, data: { formId: '550e8400-0000-0000-0000-000000000020', sourceType: 'funnel', sourceId: '550e8400-0000-0000-0000-000000000010', formAnswers: { name: 'Jane Smith', email: 'jane@example.com', which_session: '81931356157' }, submissionType: 'complete' } },
   page_visited: { event: 'page_visited', timestamp: NOW, lead: SAMPLE_LEAD, data: { funnelId: '550e8400-0000-0000-0000-000000000010', pageName: 'Landing Page', pageUrl: '/sales', visitorId: 'v_abc123', deviceType: 'desktop' } },
 
   // -- Communication --
