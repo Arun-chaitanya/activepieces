@@ -58,22 +58,6 @@ export const lifecycleDropdown = Property.Dropdown({
   },
 });
 
-export const dealStageDropdown = Property.StaticDropdown({
-  displayName: 'Deal Stage',
-  description: 'Deal pipeline stage',
-  required: false,
-  options: {
-    disabled: false,
-    options: [
-      { label: 'Discovery', value: 'discovery' },
-      { label: 'Proposal', value: 'proposal' },
-      { label: 'Negotiation', value: 'negotiation' },
-      { label: 'Closed Won', value: 'closed_won' },
-      { label: 'Closed Lost', value: 'closed_lost' },
-    ],
-  },
-});
-
 export const taskPriorityDropdown = Property.StaticDropdown({
   displayName: 'Priority',
   description: 'Task priority',
@@ -105,28 +89,6 @@ export const orderStatusDropdown = Property.StaticDropdown({
     ],
   },
 });
-
-export const leadSourceDropdown = Property.StaticDropdown({
-  displayName: 'Filter by Source',
-  description: 'Only trigger for leads from this source (optional)',
-  required: false,
-  options: {
-    disabled: false,
-    options: [
-      { label: 'Form Submission', value: 'form_submission' },
-      { label: 'Manual', value: 'manual' },
-      { label: 'Import', value: 'import' },
-      { label: 'Workflow', value: 'workflow' },
-    ],
-  },
-});
-
-// ============================================================================
-// DYNAMIC DROPDOWNS
-// Uses PieceAuth.None() + PropertyContext to load data from our API.
-// The context.project.externalId() resolves to the Supabase user ID,
-// which our API uses to determine the company.
-// ============================================================================
 
 export const formIdDropdown = Property.Dropdown({
   auth: PieceAuth.None(),
@@ -225,48 +187,6 @@ export const tagDropdown = Property.Dropdown({
       };
     } catch {
       return { disabled: true, options: [], placeholder: 'Failed to load tags' };
-    }
-  },
-});
-
-export const tagFilterDropdown = Property.Dropdown({
-  auth: PieceAuth.None(),
-  displayName: 'Filter by Tag',
-  description: 'Only trigger for this specific tag (optional)',
-  required: false,
-  refreshers: [],
-  options: async (_propsValue, context) => {
-    try {
-      const ctx = await ctxFromProperty(context);
-      const client = opplifyClient(ctx);
-      const result = await client.getMeta('tags') as { tags: string[] };
-      return {
-        disabled: false,
-        options: (result.tags || []).map((t) => ({ label: t, value: t })),
-      };
-    } catch {
-      return { disabled: true, options: [], placeholder: 'Failed to load tags' };
-    }
-  },
-});
-
-export const customFieldDropdown = Property.Dropdown({
-  auth: PieceAuth.None(),
-  displayName: 'Filter by Custom Field',
-  description: 'Only trigger when this specific custom field changes (optional)',
-  required: false,
-  refreshers: [],
-  options: async (_propsValue, context) => {
-    try {
-      const ctx = await ctxFromProperty(context);
-      const client = opplifyClient(ctx);
-      const result = await client.getMeta('custom-fields') as { customFields: Array<{ label: string; value: string }> };
-      return {
-        disabled: false,
-        options: result.customFields || [],
-      };
-    } catch {
-      return { disabled: true, options: [], placeholder: 'Failed to load custom fields' };
     }
   },
 });
