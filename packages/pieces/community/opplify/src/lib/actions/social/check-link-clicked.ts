@@ -12,6 +12,7 @@ export const checkLinkClickedAction = createAction({
   requireAuth: true,
   props: {
     leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
       description: 'The person to check (from the trigger: lead id)',
       required: true,

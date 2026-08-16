@@ -15,6 +15,7 @@ export const unsubscribeFromSequenceAction = createAction({
   requireAuth: true,
   props: {
     leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
       description: 'The person to remove (from the trigger: lead id)',
       required: true,

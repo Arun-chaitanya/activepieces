@@ -12,6 +12,7 @@ export const getInstagramProfileAction = createAction({
   requireAuth: true,
   props: {
     leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
       description: 'The person to look up (from the trigger: lead id)',
       required: true,

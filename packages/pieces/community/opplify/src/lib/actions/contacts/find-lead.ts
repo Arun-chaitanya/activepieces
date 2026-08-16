@@ -15,6 +15,7 @@ export const findLeadAction = createAction({
       required: false,
     }),
     leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
       description: 'Get lead by ID. Leave empty if using email.',
       required: false,

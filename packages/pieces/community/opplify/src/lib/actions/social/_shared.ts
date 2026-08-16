@@ -16,6 +16,7 @@ export async function socialActionCtx(context: {
 /** The two ids every social action needs, wired from the trigger's payload. */
 export const socialTargetProps = {
   leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
     displayName: 'Lead ID',
     description: 'The lead this conversation belongs to (from the trigger: lead id)',
     required: true,

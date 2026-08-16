@@ -11,6 +11,7 @@ export const changeLeadStatusAction = createAction({
   requireAuth: true,
   props: {
     leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
       description: 'The ID of the lead',
       required: true,

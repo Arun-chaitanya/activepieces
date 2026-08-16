@@ -11,6 +11,7 @@ export const sendEmailAction = createAction({
   requireAuth: true,
   props: {
     leadId: Property.ShortText({
+      defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
       description: 'The ID of the lead to email',
       required: true,
