@@ -319,6 +319,44 @@ export const zoomHostDropdown = Property.Dropdown({
   },
 });
 
+/**
+ * WHO this email is sent as. Required: a Send Email step states its sender
+ * rather than letting the server pick one at run time. Options are the
+ * teammates whose Google grant covers sending, plus the company's own email
+ * address when SendGrid is configured.
+ */
+export const emailSenderDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Send As',
+  description:
+    "Whose email address this is sent from — a teammate's connected Gmail, or the company's own email address",
+  required: true,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('email-senders') as { senders: Array<{ id: string; label: string; usable: boolean }> };
+      const senders = result.senders || [];
+      if (senders.length === 0) {
+        return {
+          disabled: true,
+          options: [],
+          placeholder: 'No email account can send yet — connect Google or SendGrid on the Connections page',
+        };
+      }
+      return {
+        disabled: false,
+        options: senders
+          .filter((s) => s.usable)
+          .map((s) => ({ label: s.label, value: s.id })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load sending accounts' };
+    }
+  },
+});
+
 export const eventTypeFilterDropdown = Property.Dropdown({
   auth: PieceAuth.None(),
   displayName: 'Event Type',

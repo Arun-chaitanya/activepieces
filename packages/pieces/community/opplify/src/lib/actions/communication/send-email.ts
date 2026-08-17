@@ -1,6 +1,7 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
+import { emailSenderDropdown } from '../../common/props';
 
 export const sendEmailAction = createAction({
   name: 'send_email',
@@ -10,6 +11,7 @@ export const sendEmailAction = createAction({
   auth: opplifyAuth,
   requireAuth: true,
   props: {
+    sender: emailSenderDropdown,
     leadId: Property.ShortText({
       defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
@@ -40,6 +42,10 @@ export const sendEmailAction = createAction({
       subject: context.propsValue.subject,
       body: context.propsValue.body,
       fromName: context.propsValue.fromName,
+      // 'company' = send as the company via SendGrid; anything else is the
+      // teammate whose Gmail sends. The server never substitutes another
+      // account when this is absent — it errors instead.
+      sender: context.propsValue.sender,
     });
   },
 });
