@@ -138,6 +138,7 @@ import { smartDelayAction } from './lib/actions/social/smart-delay';
 import { waitUntilAction } from './lib/actions/timing/wait-until';
 import { waitBusinessTimeAction } from './lib/actions/timing/wait-business-time';
 import { waitForEventAction } from './lib/actions/timing/wait-for-event';
+import { waitUntilLeadDateAction } from './lib/actions/timing/wait-until-lead-date';
 import { subscribeToSequenceAction } from './lib/actions/social/subscribe-to-sequence';
 import { unsubscribeFromSequenceAction } from './lib/actions/social/unsubscribe-from-sequence';
 import { notifyAdminAction } from './lib/actions/social/notify-admin';
@@ -305,6 +306,7 @@ export const opplify = createPiece({
     waitUntilAction,
     waitBusinessTimeAction,
     waitForEventAction,
+    waitUntilLeadDateAction,
     subscribeToSequenceAction,
     unsubscribeFromSequenceAction,
     notifyAdminAction,
