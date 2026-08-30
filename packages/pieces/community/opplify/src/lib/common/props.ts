@@ -7,7 +7,7 @@ const BASE_URL = process.env['AP_OPPLIFY_BASE_URL'] || 'http://host.docker.inter
 /**
  * Build client context from PropertyContext (dropdown options function).
  */
-async function ctxFromProperty(context: { project: { id: string; externalId: () => Promise<string | undefined> } }) {
+export async function ctxFromProperty(context: { project: { id: string; externalId: () => Promise<string | undefined> } }) {
   const externalId = await context.project.externalId() || '';
   return { projectId: context.project.id, externalId, baseUrl: BASE_URL };
 }
