@@ -1,7 +1,8 @@
+import { parseSpreadsheetId } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { google } from 'googleapis';
-import { includeTeamDrivesProp, spreadsheetIdProp } from '../common/props';
+import { spreadsheetIdProp } from '../common/props';
 import { createGoogleClient } from '../common/common';
 
 export const findWorksheetAction = createAction({
@@ -10,7 +11,6 @@ export const findWorksheetAction = createAction({
 	displayName: 'Find Worksheet(s)',
 	description: 'Finds a worksheet(s) by title.',
 	props: {
-		includeTeamDrives: includeTeamDrivesProp(),
 		spreadsheetId: spreadsheetIdProp('Spreadsheet', ''),
 		title: Property.ShortText({
 			displayName: 'Title',
@@ -25,7 +25,7 @@ export const findWorksheetAction = createAction({
 		}),
 	},
 	async run(context) {
-		const spreadsheetId = context.propsValue.spreadsheetId;
+		const spreadsheetId = parseSpreadsheetId(context.propsValue.spreadsheetId);
 		const title = context.propsValue.title;
 		const exactMatch = context.propsValue.exact_match ?? false;
 

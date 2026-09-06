@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction } from "@activepieces/pieces-framework";
 import { areSheetIdsValid, googleSheetsAuth, googleSheetsCommon, mapRowsToHeaderNames } from "../common/common";
 import { commonProps, isFirstRowHeaderProp } from "../common/props";
@@ -12,7 +13,8 @@ export const getManyRowsAction = createAction({
         first_row_headers: isFirstRowHeaderProp()
     },
     async run(context) { 
-        const {first_row_headers,sheetId,spreadsheetId} = context.propsValue;
+        const {first_row_headers,sheetId,spreadsheetId: rawSpreadsheetId} = context.propsValue;
+        const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
 
         if (!areSheetIdsValid(spreadsheetId, sheetId)) {
                     throw new Error('Please select a spreadsheet and sheet first.');

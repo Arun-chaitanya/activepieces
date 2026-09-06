@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { areSheetIdsValid, createGoogleClient } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
@@ -58,7 +59,7 @@ export const formatRowAction = createAction({
 		const sheets = google.sheets({ version: 'v4', auth: authClient });
 
 		const response = await sheets.spreadsheets.batchUpdate({
-			spreadsheetId: context.propsValue.spreadsheetId,
+			spreadsheetId: parseSpreadsheetId(context.propsValue.spreadsheetId),
 			requestBody: {
 				requests: [
 					{

@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import {
 	areSheetIdsValid,
@@ -49,7 +50,7 @@ export const insertRowAction = createAction({
 		}
 
 		const sheetId = Number(inputSheetId);
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
 		const sheetName = await googleSheetsCommon.findSheetName(auth, spreadsheetId, sheetId);
 

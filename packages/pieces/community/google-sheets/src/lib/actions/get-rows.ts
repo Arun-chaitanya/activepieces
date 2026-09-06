@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import {
   PiecePropValueSchema,
   Property,
@@ -144,7 +145,8 @@ export const getRowsAction = createAction({
     }),
   },
   async run({ store, auth, propsValue }) {
-    const { startRow, groupSize, memKey, headerRow, spreadsheetId, sheetId, useHeaderNames} = propsValue;
+    const { startRow, groupSize, memKey, headerRow, spreadsheetId: rawSpreadsheetId, sheetId, useHeaderNames} = propsValue;
+    const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
 
     if (!areSheetIdsValid(spreadsheetId, sheetId)) {
 			throw new Error('Please select a spreadsheet and sheet first.');
@@ -177,7 +179,8 @@ export const getRowsAction = createAction({
     }
   },
   async test({ store, auth, propsValue }) {
-    const { startRow, groupSize, memKey, headerRow, spreadsheetId, sheetId, useHeaderNames} = propsValue;
+    const { startRow, groupSize, memKey, headerRow, spreadsheetId: rawSpreadsheetId, sheetId, useHeaderNames} = propsValue;
+    const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
 
     if (!areSheetIdsValid(spreadsheetId, sheetId)) {
 			throw new Error('Please select a spreadsheet and sheet first.');

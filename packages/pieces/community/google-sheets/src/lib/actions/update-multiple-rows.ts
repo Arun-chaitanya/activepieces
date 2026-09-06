@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
 import {
   createAction,
@@ -33,7 +34,7 @@ export const updateMultipleRowsAction = createAction({
       refreshers: ['sheetId', 'spreadsheetId', 'headerRow'],
       props: async ({ auth, spreadsheetId, sheetId, headerRow }) => {
         const sheet_Id = Number(sheetId);
-        const spreadsheet_Id = spreadsheetId as unknown as string;
+        const spreadsheet_Id = parseSpreadsheetId(spreadsheetId);
         const authentication = auth;
 
         if (
@@ -118,7 +119,7 @@ export const updateMultipleRowsAction = createAction({
     }
 
     const sheetId = Number(inputSheetId);
-    const spreadsheetId = inputSpreadsheetId as string;
+    const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
     const sheetName = await getWorkSheetName(
       context.auth,

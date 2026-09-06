@@ -1,5 +1,5 @@
 import { DropdownOption, Property } from '@activepieces/pieces-framework';
-import { google, drive_v3 } from 'googleapis';
+import { google } from 'googleapis';
 import {
 	columnToLabel,
 	createGoogleClient,
@@ -7,6 +7,7 @@ import {
 	googleSheetsAuth,
 	GoogleSheetsAuthValue,
 	googleSheetsCommon,
+	parseSpreadsheetId,
 } from './common';
 import { isNil } from '@activepieces/shared';
 
@@ -18,67 +19,13 @@ const createEmptyOptionList = (message: string) => {
 	};
 };
 
-export const includeTeamDrivesProp = () =>
-	Property.Checkbox({
-		displayName: 'Include Shared Drive Sheets ?',
-		description: 'Turn this on to also see spreadsheets from Shared Drives.',
-		defaultValue: false,
-		required: false,
-	});
-
 export const spreadsheetIdProp = (displayName: string, description: string, required = true) =>
-	Property.Dropdown({
+	Property.ShortText({
 		displayName,
-		description,
-		auth: googleSheetsAuth,
+		description:
+			description ||
+			"Paste the spreadsheet's URL from your browser, or its id. The account you connected must have access to it.",
 		required,
-		refreshers: ['includeTeamDrives'],
-		options: async ({ auth, includeTeamDrives }, { searchValue }) => {
-			if (!auth) {
-				return createEmptyOptionList('please connect your account first.');
-			}
-
-			const authValue = auth;
-
-			const authClient = await createGoogleClient(authValue);
-
-			const drive = google.drive({ version: 'v3', auth: authClient });
-
-			const q = ["mimeType='application/vnd.google-apps.spreadsheet'", 'trashed = false'];
-
-			if (searchValue) {
-				q.push(`name contains '${searchValue}'`);
-			}
-
-			let nextPageToken;
-			const options: DropdownOption<string>[] = [];
-			do {
-				const response: any = await drive.files.list({
-					q: q.join(' and '),
-					pageToken: nextPageToken,
-					orderBy: 'createdTime desc',
-					fields: 'nextPageToken, files(id, name)',
-					supportsAllDrives: true,
-					includeItemsFromAllDrives: includeTeamDrives ? true : false,
-				});
-				const fileList: drive_v3.Schema$FileList = response.data;
-
-				if (fileList.files) {
-					for (const file of fileList.files) {
-						options.push({
-							label: file.name!,
-							value: file.id!,
-						});
-					}
-				}
-				nextPageToken = response.data.nextPageToken;
-			} while (nextPageToken);
-
-			return {
-				disabled: false,
-				options,
-			};
-		},
 	});
 
 export const sheetIdProp = (displayName: string, description: string, required = true) =>
@@ -104,7 +51,7 @@ export const sheetIdProp = (displayName: string, description: string, required =
 			const sheets = google.sheets({ version: 'v4', auth: authClient });
 
 			const response = await sheets.spreadsheets.get({
-				spreadsheetId: spreadsheetId as unknown as string,
+				spreadsheetId: parseSpreadsheetId(spreadsheetId),
 			});
 
 			const sheetsData = response.data.sheets ?? [];
@@ -131,8 +78,7 @@ export const sheetIdProp = (displayName: string, description: string, required =
 	});
 
 export const commonProps = {
-	includeTeamDrives: includeTeamDrivesProp(),
-	spreadsheetId: spreadsheetIdProp('Spreadsheet', 'The ID of the spreadsheet to use.'),
+	spreadsheetId: spreadsheetIdProp('Spreadsheet', ''),
 	sheetId: sheetIdProp('Worksheet', 'The ID of the worksheet to use.'),
 };
 
@@ -155,7 +101,7 @@ export const rowValuesProp = () =>
 			const authValue = auth as GoogleSheetsAuthValue;
 
 			const headers = await googleSheetsCommon.getHeaderRow({
-				spreadsheetId: spreadsheetId as unknown as string,
+				spreadsheetId: parseSpreadsheetId(spreadsheetId),
 				auth: authValue,
 				sheetId: sheet_id,
 			});
@@ -194,7 +140,7 @@ export const columnNameProp = () =>
 		auth: googleSheetsAuth,
 		refreshers: ['sheetId', 'spreadsheetId'],
 		options: async ({ auth, spreadsheetId, sheetId }) => {
-			const spreadsheet_id = spreadsheetId as string;
+			const spreadsheet_id = parseSpreadsheetId(spreadsheetId);
 			const sheet_id = Number(sheetId) as number;
 			if (
 				!auth ||

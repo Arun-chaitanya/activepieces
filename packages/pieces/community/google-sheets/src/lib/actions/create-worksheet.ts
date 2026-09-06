@@ -1,7 +1,8 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { createGoogleClient } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
-import { includeTeamDrivesProp, spreadsheetIdProp } from '../common/props';
+import { spreadsheetIdProp } from '../common/props';
 import { google } from 'googleapis';
 
 export const createWorksheetAction = createAction({
@@ -10,7 +11,6 @@ export const createWorksheetAction = createAction({
   displayName: 'Create Worksheet',
   description:'Create a new blank worksheet with a title.',
   props: {
-    includeTeamDrives: includeTeamDrivesProp(),
     spreadsheetId: spreadsheetIdProp('Spreadsheet',''),
     title:Property.ShortText({
         displayName:'Title',
@@ -24,7 +24,8 @@ export const createWorksheetAction = createAction({
    
   },
   async run(context){
-    const {spreadsheetId,title} = context.propsValue;
+    const {spreadsheetId: rawSpreadsheetId,title} = context.propsValue;
+    const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
     const headers = context.propsValue.headers as string[] ?? [];
 	const client = await createGoogleClient(context.auth);
     const sheetsApi = google.sheets({ version: 'v4', auth: client });

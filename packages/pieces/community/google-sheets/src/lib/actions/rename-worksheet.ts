@@ -1,6 +1,7 @@
+import { parseSpreadsheetId } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
-import { includeTeamDrivesProp, sheetIdProp, spreadsheetIdProp } from '../common/props';
+import { sheetIdProp, spreadsheetIdProp } from '../common/props';
 import { google } from 'googleapis';
 import { createGoogleClient } from '../common/common';
 
@@ -10,7 +11,6 @@ export const renameWorksheetAction = createAction({
     displayName: 'Rename Worksheet',
     description: 'Rename specific worksheet.',
     props: {
-        includeTeamDrives: includeTeamDrivesProp(),
         spreadsheetId: spreadsheetIdProp('Spreadsheet', 'The ID of the spreadsheet to use.'),
         sheetId: sheetIdProp('Worksheet', 'The ID of the worksheet to rename.'),
         newName:Property.ShortText({
@@ -23,7 +23,7 @@ export const renameWorksheetAction = createAction({
         const sheets = google.sheets({ version: 'v4', auth: authClient });
 
         const response = await sheets.spreadsheets.batchUpdate({
-            spreadsheetId: context.propsValue.spreadsheetId,
+            spreadsheetId: parseSpreadsheetId(context.propsValue.spreadsheetId),
             requestBody: {
                 requests:[
                     {

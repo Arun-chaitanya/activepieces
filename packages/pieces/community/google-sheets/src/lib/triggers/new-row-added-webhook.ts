@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import {
 	DEDUPE_KEY_PROPERTY,
 	Property,
@@ -47,7 +48,7 @@ export const newRowAddedTrigger = createTrigger({
 				}
 		
 		const sheetId = Number(inputSheetId);
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
 		const sheetName = await getWorkSheetName(context.auth, spreadsheetId, sheetId);
 		const currentSheetValues = await getWorkSheetValues(context.auth, spreadsheetId, sheetName);
@@ -58,7 +59,6 @@ export const newRowAddedTrigger = createTrigger({
 			context.auth,
 			spreadsheetId,
 			context.webhookUrl,
-			context.propsValue.includeTeamDrives,
 		);
 
 		await context.store.put<WebhookInformation>(
@@ -93,7 +93,7 @@ export const newRowAddedTrigger = createTrigger({
 				}
 		
 		const sheetId = Number(inputSheetId);
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
 		const oldRowCount = (await context.store.get(`${sheetId}`)) as number;
 
@@ -140,7 +140,7 @@ export const newRowAddedTrigger = createTrigger({
 					throw new Error('Please select a spreadsheet and sheet first.');
 				}
 		
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
 		if (webhook != null && webhook.id != null && webhook.resourceId != null) {
 			await deleteFileNotification(context.auth, webhook.id, webhook.resourceId);
@@ -148,7 +148,6 @@ export const newRowAddedTrigger = createTrigger({
 				context.auth,
 				spreadsheetId,
 				context.webhookUrl,
-				context.propsValue.includeTeamDrives,
 			);
 			await context.store.put<WebhookInformation>(
 				'googlesheets_new_row_added',
@@ -164,7 +163,7 @@ export const newRowAddedTrigger = createTrigger({
 				}
 		
 		const sheetId = Number(inputSheetId);
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 		
 		const sheetName = await getWorkSheetName(context.auth, spreadsheetId, sheetId);
 		const currentSheetValues = await getWorkSheetValues(context.auth, spreadsheetId, sheetName);

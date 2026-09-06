@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
 import {
 	createAction,
@@ -62,7 +63,7 @@ export const insertMultipleRowsAction = createAction({
 			refreshers: ['sheetId', 'spreadsheetId', 'input_type', 'headerRow'],
 			props: async ({ auth, sheetId, spreadsheetId, input_type, headerRow }) => {
 				const sheet_id = Number(sheetId);
-				const spreadsheet_id = spreadsheetId as unknown as string;
+				const spreadsheet_id = parseSpreadsheetId(spreadsheetId);
 				const valuesInputType = input_type as unknown as string;
 
 				if (
@@ -170,7 +171,7 @@ export const insertMultipleRowsAction = createAction({
 			required: false,
 			props: async ({ auth, spreadsheetId, sheetId, check_for_duplicate, headerRow }) => {
 				const sheet_id = Number(sheetId);
-				const spreadsheet_id = spreadsheetId as unknown as string;
+				const spreadsheet_id = parseSpreadsheetId(spreadsheetId);
 				const checkForExisting = check_for_duplicate as unknown as boolean;
 				if (
 					!auth ||
@@ -255,7 +256,7 @@ export const insertMultipleRowsAction = createAction({
 		}
 
 		const sheetId = Number(inputSheetId);
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
 		const duplicateColumn = context.propsValue.check_for_duplicate_column?.['column_name'];
 		const sheetName = await getWorkSheetName(context.auth, spreadsheetId, sheetId);

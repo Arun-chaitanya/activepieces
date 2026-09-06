@@ -330,6 +330,19 @@ export const getAccessToken = async (auth: GoogleSheetsAuthValue): Promise<strin
 	return auth.access_token;
 }
 
+/**
+ * OPPLIFY: the spreadsheet property is a text input (a pasted URL or a bare
+ * id) because listing a user's spreadsheets needs a restricted Drive scope.
+ * Every consumer normalises through here so a full
+ * https://docs.google.com/spreadsheets/d/<id>/edit#gid=0 URL works as well as
+ * the id alone.
+ */
+export function parseSpreadsheetId(value: unknown): string {
+	const raw = (value ?? '').toString().trim();
+	const match = /\/spreadsheets\/d\/([a-zA-Z0-9\-_]+)/.exec(raw);
+	return match ? match[1] : raw;
+}
+
 export function areSheetIdsValid(spreadsheetId: string | null | undefined, sheetId: string | number | null | undefined): boolean {
     return !isNil(spreadsheetId) && spreadsheetId !== "" &&
            !isNil(sheetId) && sheetId !== "";

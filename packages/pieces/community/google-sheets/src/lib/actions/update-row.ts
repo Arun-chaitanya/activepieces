@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { areSheetIdsValid, createGoogleClient, Dimension, objectToArray, ValueInputOption } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
@@ -22,7 +23,7 @@ export const updateRowAction = createAction({
     values: rowValuesProp(),
   },
   async run(context) {
-    const inputSpreadsheetId = context.propsValue.spreadsheetId;
+    const inputSpreadsheetId = parseSpreadsheetId(context.propsValue.spreadsheetId);
     const inputSheetId = context.propsValue.sheetId;
     const rowId = context.propsValue.row_id;
     const isFirstRowHeaders = context.propsValue.first_row_headers;
@@ -33,7 +34,7 @@ export const updateRowAction = createAction({
 		}
 
     const sheetId = Number(inputSheetId);
-		const spreadsheetId = inputSpreadsheetId as string;
+		const spreadsheetId = parseSpreadsheetId(inputSpreadsheetId);
 
     const authClient = await createGoogleClient(context.auth);
 

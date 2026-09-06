@@ -1,8 +1,9 @@
+import { parseSpreadsheetId } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
 import { createTrigger, TriggerStrategy } from '@activepieces/pieces-framework';
 import { google } from 'googleapis';
 import { isNil } from '@activepieces/shared';
-import { includeTeamDrivesProp, spreadsheetIdProp } from '../common/props';
+import { spreadsheetIdProp } from '../common/props';
 import { createGoogleClient } from '../common/common';
 
 export const newWorksheetTrigger = createTrigger({
@@ -12,7 +13,6 @@ export const newWorksheetTrigger = createTrigger({
 	description: 'Triggers when a worksheet is created in a spreadsheet.',
 	type: TriggerStrategy.POLLING,
 	props: {
-		includeTeamDrives: includeTeamDrivesProp(),
 		spreadsheetId: spreadsheetIdProp('Spreadsheet', '',true),
 	},
 	async onEnable(context) {
@@ -20,7 +20,7 @@ export const newWorksheetTrigger = createTrigger({
 		const authClient = await createGoogleClient(context.auth);
 		const sheets = google.sheets({ version: 'v4', auth: authClient });
 		const response = await sheets.spreadsheets.get({
-			spreadsheetId: context.propsValue.spreadsheetId as string,
+			spreadsheetId: parseSpreadsheetId(context.propsValue.spreadsheetId),
 		});
 		if (response.data.sheets) {
 			for (const sheet of response.data.sheets) {
@@ -40,7 +40,7 @@ export const newWorksheetTrigger = createTrigger({
 		const authClient = await createGoogleClient(context.auth);
 		const sheets = google.sheets({ version: 'v4', auth: authClient });
 		const response = await sheets.spreadsheets.get({
-			spreadsheetId: context.propsValue.spreadsheetId as string,
+			spreadsheetId: parseSpreadsheetId(context.propsValue.spreadsheetId),
 		});
 
 		if (response.data.sheets) {
@@ -59,7 +59,7 @@ export const newWorksheetTrigger = createTrigger({
 		const sheets = google.sheets({ version: 'v4', auth: authClient });
 
 		const response = await sheets.spreadsheets.get({
-			spreadsheetId: context.propsValue.spreadsheetId as string,
+			spreadsheetId: parseSpreadsheetId(context.propsValue.spreadsheetId),
 		});
 		if (isNil(response.data.sheets) || response.data.sheets.length === 0) {
 			return [];

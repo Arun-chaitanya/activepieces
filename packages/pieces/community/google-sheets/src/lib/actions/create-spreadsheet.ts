@@ -1,122 +1,37 @@
-import {
-	AppConnectionValueForAuthProperty,
-	createAction,
-	PiecePropValueSchema,
-	Property,
-} from '@activepieces/pieces-framework';
-import {
-	AuthenticationType,
-	httpClient,
-	HttpMethod,
-	HttpRequest,
-} from '@activepieces/pieces-common';
+import { createAction, Property } from '@activepieces/pieces-framework';
 import { google } from 'googleapis';
-import { includeTeamDrivesProp } from '../common/props';
-import { createGoogleClient, getAccessToken, googleSheetsAuth } from '../common/common';
-import { AppConnectionType, isNil } from '@activepieces/shared';
+import { createGoogleClient, googleSheetsAuth } from '../common/common';
 
+// OPPLIFY: created through the Sheets API instead of Drive. The upstream
+// version listed Drive folders for a "Parent Folder" dropdown and created the
+// file through drive.files.create; both need a Drive scope, which the Opplify
+// Google connection deliberately does not request
+// (sprints/google-scopes-unrestricted.md D1). The new spreadsheet lands in the
+// root of My Drive, and the response carries its URL so the user can move it.
 export const createSpreadsheetAction = createAction({
 	auth: googleSheetsAuth,
 	name: 'create-spreadsheet',
 	displayName: 'Create Spreadsheet',
-	description: 'Creates a blank spreadsheet.',
+	description: 'Creates a blank spreadsheet in the root of your Drive.',
 	props: {
 		title: Property.ShortText({
 			displayName: 'Title',
 			description: 'The title of the new spreadsheet.',
 			required: true,
 		}),
-		includeTeamDrives: includeTeamDrivesProp(),
-		folder: Property.Dropdown({
-			auth: googleSheetsAuth,
-			displayName: 'Parent Folder',
-			description:
-				'The folder to create the worksheet in.By default, the new worksheet is created in the root folder of drive.',
-			required: false,
-			refreshers: ['auth', 'includeTeamDrives'],
-			options: async ({ auth, includeTeamDrives }) => {
-				if (!auth) {
-					return {
-						disabled: true,
-						options: [],
-						placeholder: 'Please authenticate first',
-					};
-				}
-				const authProp = auth;
-				let folders: { id: string; name: string }[] = [];
-				const isServiceAccountWithoutImpersonation = authProp.type === AppConnectionType.CUSTOM_AUTH && authProp.props.userEmail?.length === 0;
-				let pageToken = null;
-				do {
-					const request: HttpRequest = {
-						method: HttpMethod.GET,
-						url: `https://www.googleapis.com/drive/v3/files`,
-						queryParams: {
-							q: "mimeType='application/vnd.google-apps.folder' and trashed = false",
-							includeItemsFromAllDrives: includeTeamDrives || isServiceAccountWithoutImpersonation ? 'true' : 'false',
-							supportsAllDrives: 'true',
-						},
-						authentication: {
-							type: AuthenticationType.BEARER_TOKEN,
-							token: await getAccessToken(authProp),
-						},
-					};
-					if (pageToken) {
-						if (request.queryParams !== undefined) {
-							request.queryParams['pageToken'] = pageToken;
-						}
-					}
-					try {
-						const response = await httpClient.sendRequest<{
-							files: { id: string; name: string,teamDriveId?: string }[];
-							nextPageToken: string;
-						}>(request);
-						folders = folders.concat(response.body.files.filter(file => !isNil(file.teamDriveId) || !isServiceAccountWithoutImpersonation));
-						pageToken = response.body.nextPageToken;
-					} catch (e) {
-						throw new Error(`Failed to get folders\nError:${e}`);
-					}
-				} while (pageToken);
-
-				return {
-					disabled: false,
-					options: folders.map((folder: { id: string; name: string }) => {
-						return {
-							label: folder.name,
-							value: folder.id,
-						};
-					}),
-				};
-			},
-		}),
 	},
 	async run(context) {
-		const { title, folder } = context.propsValue;
-		const response = await createSpreadsheet(context.auth, title, folder);
-		const newSpreadsheetId = response.id;
-
-	
+		const { title } = context.propsValue;
+		const authClient = await createGoogleClient(context.auth);
+		const sheets = google.sheets({ version: 'v4', auth: authClient });
+		const response = await sheets.spreadsheets.create({
+			requestBody: { properties: { title } },
+			fields: 'spreadsheetId,spreadsheetUrl',
+		});
 
 		return {
-			id: newSpreadsheetId,
+			id: response.data.spreadsheetId,
+			url: response.data.spreadsheetUrl,
 		};
 	},
 });
-
-async function createSpreadsheet(
-	auth: AppConnectionValueForAuthProperty<typeof googleSheetsAuth>,
-	title: string,
-	folderId?: string,
-) {
-	const googleClient = await createGoogleClient(auth);
-  const driveApi = google.drive({ version: 'v3', auth: googleClient });
-  const response = await driveApi.files.create({
-    requestBody: {
-      name: title,
-      mimeType: 'application/vnd.google-apps.spreadsheet',
-      parents: folderId ? [folderId] : undefined,
-    },
-    supportsAllDrives: true,
-  });
-  return response.data;
-}
-

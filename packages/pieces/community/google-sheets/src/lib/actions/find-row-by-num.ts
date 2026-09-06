@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { Property, createAction } from '@activepieces/pieces-framework';
 import { areSheetIdsValid, googleSheetsCommon } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
@@ -23,7 +24,8 @@ export const findRowByNumAction = createAction({
 		}),
 	},
 	async run(context) {
-		const { spreadsheetId, sheetId, rowNumber, headerRow } = context.propsValue;
+		const { spreadsheetId: rawSpreadsheetId, sheetId, rowNumber, headerRow } = context.propsValue;
+		const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
 
 		if (!areSheetIdsValid(spreadsheetId, sheetId)) {
 			throw new Error('Please select a spreadsheet and sheet first.');

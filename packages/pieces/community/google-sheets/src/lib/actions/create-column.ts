@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import {
@@ -30,7 +31,8 @@ export const createColumnAction = createAction({
 		}),
 	},
 	async run(context) {
-		const { spreadsheetId, sheetId, columnName, columnIndex } = context.propsValue;
+		const { spreadsheetId: rawSpreadsheetId, sheetId, columnName, columnIndex } = context.propsValue;
+		const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
 
 		if (!areSheetIdsValid(spreadsheetId, sheetId)) {
 			throw new Error('Please select a spreadsheet and sheet first.');

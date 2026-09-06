@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import {
 	areSheetIdsValid,
@@ -59,7 +60,7 @@ description: 'Look up rows in a worksheet based on a column value.',
 			numberOfRows: z.number().min(1).optional(),
 		});
 
-		const spreadsheetId = propsValue.spreadsheetId;
+		const spreadsheetId = parseSpreadsheetId(propsValue.spreadsheetId);
 		const sheetId = propsValue.sheetId;
 		const startingRow = propsValue.startingRow ?? 1;
 		const numberOfRowsToReturn = propsValue.numberOfRows ?? 1;

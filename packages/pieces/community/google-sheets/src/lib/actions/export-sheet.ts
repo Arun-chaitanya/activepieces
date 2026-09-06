@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import {
   httpClient,
@@ -42,7 +43,7 @@ export const exportSheetAction = createAction({
       throw new Error('Please select a spreadsheet and sheet first.');
     }
 
-    const spreadsheet_id = spreadsheetId as string;
+    const spreadsheet_id = parseSpreadsheetId(spreadsheetId);
     const sheet_id = sheetId as number;
 
     const exportUrl = `https://docs.google.com/spreadsheets/d/${spreadsheet_id}/export?format=${format}&id=${spreadsheet_id}&gid=${sheet_id}`;

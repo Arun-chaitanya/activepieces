@@ -1,3 +1,4 @@
+import { parseSpreadsheetId } from '../common/common';
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { areSheetIdsValid, googleSheetsCommon } from '../common/common';
 import { googleSheetsAuth } from '../common/common';
@@ -17,7 +18,8 @@ export const deleteRowAction = createAction({
     }),
   },
   async run(context) {
-    const { spreadsheetId, sheetId, rowId } = context.propsValue;
+    const { spreadsheetId: rawSpreadsheetId, sheetId, rowId } = context.propsValue;
+    const spreadsheetId = parseSpreadsheetId(rawSpreadsheetId);
 
     if (!areSheetIdsValid(spreadsheetId,sheetId)) {
 			throw new Error('Please select a spreadsheet and sheet first.');
