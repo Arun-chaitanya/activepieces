@@ -2,7 +2,7 @@ import { google } from 'googleapis';
 import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 import crypto from 'crypto';
-import { columnToLabel, createGoogleClient, GoogleSheetsAuthValue } from '../common/common';
+import { columnToLabel, createGoogleClient, GoogleSheetsAuthValue, requireDriveAuth } from '../common/common';
 import { isNil } from '@activepieces/shared';
 
 export async function getWorkSheetName(
@@ -67,6 +67,7 @@ export async function createFileNotification(
 	url: string,
 	includeTeamDrives?: boolean,
 ) {
+	requireDriveAuth(auth);
 	const authClient = await createGoogleClient(auth);
 
 	const drive = google.drive({ version: 'v3', auth: authClient });

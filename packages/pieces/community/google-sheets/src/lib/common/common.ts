@@ -337,6 +337,32 @@ export const getAccessToken = async (auth: GoogleSheetsAuthValue): Promise<strin
  * https://docs.google.com/spreadsheets/d/<id>/edit#gid=0 URL works as well as
  * the id alone.
  */
+/**
+ * OPPLIFY: Drive access is a restricted Google scope the pooled OAuth login
+ * never requests (sprints/google-scopes-unrestricted.md D3). Steps that need
+ * it (listing spreadsheets or folders, watching a file for changes) work only
+ * on a service-account connection, which carries its own Drive access with no
+ * user consent. Dropdowns answer with the message; run/enable throw it.
+ */
+export const DRIVE_AUTH_MESSAGE =
+	'This step needs a Google service-account connection. The Opplify Google login does not include Drive access.';
+
+export function isDriveCapableAuth(auth: GoogleSheetsAuthValue | undefined | null): boolean {
+	return !isNil(auth) && auth.type === AppConnectionType.CUSTOM_AUTH;
+}
+
+export function requireDriveAuth(auth: GoogleSheetsAuthValue | undefined | null): void {
+	if (!isDriveCapableAuth(auth)) {
+		throw new Error(DRIVE_AUTH_MESSAGE);
+	}
+}
+
+export const driveAuthPlaceholder = () => ({
+	disabled: true,
+	placeholder: DRIVE_AUTH_MESSAGE,
+	options: [],
+});
+
 export function parseSpreadsheetId(value: unknown): string {
 	const raw = (value ?? '').toString().trim();
 	const match = /\/spreadsheets\/d\/([a-zA-Z0-9\-_]+)/.exec(raw);

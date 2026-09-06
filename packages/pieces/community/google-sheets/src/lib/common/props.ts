@@ -19,6 +19,14 @@ const createEmptyOptionList = (message: string) => {
 	};
 };
 
+export const includeTeamDrivesProp = () =>
+	Property.Checkbox({
+		displayName: 'Include Shared Drive Sheets ?',
+		description: 'Turn this on to also see spreadsheets from Shared Drives.',
+		defaultValue: false,
+		required: false,
+	});
+
 export const spreadsheetIdProp = (displayName: string, description: string, required = true) =>
 	Property.ShortText({
 		displayName,

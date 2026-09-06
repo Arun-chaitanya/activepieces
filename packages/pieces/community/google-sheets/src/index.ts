@@ -19,6 +19,8 @@ import { newOrUpdatedRowTrigger } from './lib/triggers/new-or-updated-row.trigge
 import { insertMultipleRowsAction } from './lib/actions/insert-multiple-rows.action';
 import { createWorksheetAction } from './lib/actions/create-worksheet';
 import { createSpreadsheetAction } from './lib/actions/create-spreadsheet';
+import { findSpreadsheets } from './lib/actions/find-spreadsheets';
+import { newSpreadsheetTrigger } from './lib/triggers/new-spreadsheet';
 import { newWorksheetTrigger } from './lib/triggers/new-worksheet';
 import { findWorksheetAction } from './lib/actions/find-worksheet';
 import { copyWorksheetAction } from './lib/actions/copy-worksheet';
@@ -54,6 +56,7 @@ export const googleSheets = createPiece({
 		deleteRowAction,
 		findRowsAction,
 		createSpreadsheetAction,
+		findSpreadsheets,
 		createWorksheetAction,
 		clearSheetAction,
 		deleteWorksheetAction,
@@ -82,6 +85,7 @@ export const googleSheets = createPiece({
 	description: 'Create, edit, and collaborate on spreadsheets online',
 	triggers: [
 		newOrUpdatedRowTrigger,
+		newSpreadsheetTrigger,
 		newRowAddedTrigger,
 		newWorksheetTrigger,
 	],
