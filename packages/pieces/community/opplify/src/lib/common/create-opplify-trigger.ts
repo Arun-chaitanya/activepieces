@@ -134,15 +134,28 @@ export function createOpplifyTrigger(config: OpplifyTriggerConfig) {
         filters['sequenceFlowId'] = context.flows.current.id;
       }
       const subscriptionIds: string[] = [];
-      for (const eventType of eventTypes) {
-        const subscriptionId = await client.subscribe({
-          eventType,
-          webhookUrl: context.webhookUrl,
-          flowId: context.flows.current.id,
-          triggerName: config.name,
-          filters,
-        });
-        subscriptionIds.push(subscriptionId);
+      try {
+        for (const eventType of eventTypes) {
+          const subscriptionId = await client.subscribe({
+            eventType,
+            webhookUrl: context.webhookUrl,
+            flowId: context.flows.current.id,
+            triggerName: config.name,
+            filters,
+          });
+          subscriptionIds.push(subscriptionId);
+        }
+      } catch (err) {
+        // All or nothing: a row created before the failure would keep
+        // delivering to a flow that never enabled. Undo, then surface.
+        for (const subscriptionId of subscriptionIds) {
+          try {
+            await client.unsubscribe({ subscriptionId });
+          } catch {
+            // best effort — the enable error below is the one to report
+          }
+        }
+        throw err;
       }
       await context.store.put('subscriptionIds', subscriptionIds);
       // Single-event triggers published before the multi-event store key
@@ -155,11 +168,16 @@ export function createOpplifyTrigger(config: OpplifyTriggerConfig) {
       const stored = await context.store.get<string[]>('subscriptionIds');
       const legacy = await context.store.get<string>('subscriptionId');
       const ids = new Set<string>([...(stored ?? []), ...(legacy ? [legacy] : [])]);
-      if (ids.size === 0) return;
       const ctx = await getClientContext(context);
       const client = opplifyClient(ctx);
       for (const subscriptionId of ids) {
         await client.unsubscribe({ subscriptionId });
+      }
+      // Belt and braces: whatever the store says, no row of this flow for
+      // any of this trigger's event types may outlive the disable (an
+      // interrupted enable can leave one without a stored id).
+      for (const eventType of eventTypes) {
+        await client.unsubscribe({ flowId: context.flows.current.id, eventType });
       }
     },
 
