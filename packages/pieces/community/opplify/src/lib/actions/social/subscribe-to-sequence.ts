@@ -22,6 +22,7 @@ export const subscribeToSequenceAction = createAction({
       required: true,
     }),
     communicationId: Property.ShortText({
+      defaultValue: "{{trigger['data']['communication_id']}}",
       displayName: 'Communication ID',
       description:
         'The message that led to this enrollment (from the trigger: communication id). ' +

@@ -18,6 +18,7 @@ export const getInstagramProfileAction = createAction({
       required: true,
     }),
     communicationId: Property.ShortText({
+      defaultValue: "{{trigger['data']['communication_id']}}",
       displayName: 'Message ID',
       description:
         'The received message from the trigger (data communication_id) — makes sure the lookup uses the account that received it',
