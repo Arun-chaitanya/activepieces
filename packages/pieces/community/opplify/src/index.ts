@@ -46,6 +46,13 @@ import { instagramMentionReceived } from './lib/triggers/social/instagram-mentio
 import { facebookDmReceived } from './lib/triggers/social/facebook-dm-received';
 import { sequenceSubscribed } from './lib/triggers/social/sequence-subscribed';
 import { facebookCommentReceived } from './lib/triggers/social/facebook-comment-received';
+// Unified social triggers (one trigger, both platforms). The per-platform
+// triggers above stay registered for flows published before the unification;
+// the builder hides them from the picker.
+import { commentReceived } from './lib/triggers/social/comment-received';
+import { dmReceived } from './lib/triggers/social/dm-received';
+import { storyReplyReceived } from './lib/triggers/social/story-reply-received';
+import { mentionReceived } from './lib/triggers/social/mention-received';
 
 // Category 4: Appointments / Scheduling (5)
 import { appointmentBooked } from './lib/triggers/appointments/appointment-booked';
@@ -227,7 +234,11 @@ export const opplify = createPiece({
     whatsappFailed,
     whatsappReceived,
     noteCreated,
-    // Social — Instagram / Facebook (6)
+    // Social — Instagram / Facebook: unified (4) + legacy per-platform (6)
+    commentReceived,
+    dmReceived,
+    storyReplyReceived,
+    mentionReceived,
     instagramDmReceived,
     instagramCommentReceived,
     instagramStoryReplyReceived,

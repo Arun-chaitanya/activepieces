@@ -454,9 +454,11 @@ interface SocialMediaOption {
   caption: string | null;
   mediaType: string | null;
   timestamp: string | null;
+  /** Set when the picker spans several accounts (unified triggers). */
+  accountName?: string | null;
 }
 
-function mediaOptionLabel(item: SocialMediaOption): string {
+function mediaOptionLabel(item: SocialMediaOption, withAccount: boolean): string {
   const date = item.timestamp ? item.timestamp.slice(0, 10) : '';
   const kind =
     item.mediaType === 'VIDEO' || item.mediaType === 'REELS'
@@ -465,8 +467,66 @@ function mediaOptionLabel(item: SocialMediaOption): string {
   const caption = (item.caption || '').replace(/\s+/g, ' ').trim();
   const excerpt =
     caption.length > 60 ? `${caption.slice(0, 60)}…` : caption || '(no caption)';
-  return [kind, date, excerpt].filter(Boolean).join(' · ');
+  const account = withAccount && item.accountName ? item.accountName : '';
+  return [account, kind, date, excerpt].filter(Boolean).join(' · ');
 }
+
+
+interface SocialIntegrationOption {
+  id: string;
+  name: string;
+  channel?: string;
+  provider_identifier: string;
+}
+
+function accountLabel(item: SocialIntegrationOption): string {
+  const channel = item.channel
+    ? item.channel
+    : item.provider_identifier === 'facebook'
+      ? 'facebook'
+      : 'instagram';
+  return `${item.name} (${channel === 'facebook' ? 'Facebook' : 'Instagram'})`;
+}
+
+/**
+ * The unified social triggers' account picker: every connected Instagram and
+ * Facebook account, multi-select, platform in the label. Empty = all accounts
+ * (the trigger drops an empty list from its filters).
+ */
+export const socialIntegrationsMultiDropdown = setupPanel(
+  Property.MultiSelectDropdown({
+    auth: PieceAuth.None(),
+    displayName: 'Connected accounts',
+    description:
+      'Fire for these Instagram/Facebook accounts. Leave empty for every connected account.',
+    required: false,
+    refreshers: [],
+    options: async (_propsValue, context) => {
+      try {
+        const ctx = await ctxFromProperty(context);
+        const client = opplifyClient(ctx);
+        const result = (await client.getMeta('social-integrations')) as {
+          integrations: SocialIntegrationOption[];
+        };
+        const integrations = result.integrations || [];
+        if (integrations.length === 0) {
+          return {
+            disabled: true,
+            options: [],
+            placeholder: 'Connect an Instagram or Facebook account first',
+          };
+        }
+        return {
+          disabled: false,
+          options: integrations.map((i) => ({ label: accountLabel(i), value: i.id })),
+        };
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return { disabled: true, options: [], placeholder: 'Error: ' + msg.substring(0, 100) };
+      }
+    },
+  })
+);
 
 export const mediaIdProp = setupPanel(
   Property.Dropdown({
@@ -475,10 +535,19 @@ export const mediaIdProp = setupPanel(
     description:
       'The specific post/reel to watch (used when "A specific post or reel" is selected)',
     required: false,
-    refreshers: ['integrationId'],
+    refreshers: ['integrationId', 'integrationIds'],
     options: async (propsValue, context) => {
-      const integrationId = propsValue['integrationId'];
-      if (typeof integrationId !== 'string' || integrationId === '') {
+      // Legacy single-account triggers pass integrationId; the unified
+      // triggers pass integrationIds (empty = every connected account).
+      const single = propsValue['integrationId'];
+      const many = propsValue['integrationIds'];
+      const ids: string[] =
+        typeof single === 'string' && single !== ''
+          ? [single]
+          : Array.isArray(many)
+            ? many.filter((v): v is string => typeof v === 'string' && v !== '')
+            : [];
+      if ('integrationId' in propsValue && ids.length === 0) {
         return {
           disabled: true,
           options: [],
@@ -488,21 +557,24 @@ export const mediaIdProp = setupPanel(
       try {
         const ctx = await ctxFromProperty(context);
         const client = opplifyClient(ctx);
-        const result = (await client.getMeta(
-          `social-media?integrationId=${encodeURIComponent(integrationId)}`
-        )) as { media?: SocialMediaOption[]; reason?: string };
+        const query = ids.length > 0 ? `?integrationIds=${encodeURIComponent(ids.join(','))}` : '';
+        const result = (await client.getMeta(`social-media${query}`)) as {
+          media?: SocialMediaOption[];
+          reason?: string;
+        };
         const media = result.media || [];
         if (media.length === 0) {
           return {
             disabled: true,
             options: [],
-            placeholder: result.reason || 'No recent posts on this account',
+            placeholder: result.reason || 'No recent posts on these accounts',
           };
         }
+        const withAccount = ids.length !== 1;
         return {
           disabled: false,
           options: media.map((item) => ({
-            label: mediaOptionLabel(item),
+            label: mediaOptionLabel(item, withAccount),
             value: item.id,
           })),
         };

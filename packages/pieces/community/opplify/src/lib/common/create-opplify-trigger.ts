@@ -11,7 +11,15 @@ interface OpplifyTriggerConfig {
   name: string;
   displayName: string;
   description: string;
-  eventType: string;
+  /**
+   * The event-bridge event type this trigger subscribes to. A trigger that
+   * spans several platform events (the unified social triggers: one
+   * "Comment received" listening on instagram_comment_received AND
+   * facebook_comment_received) lists them all in `eventTypes` instead; one
+   * event_subscriptions row is created per type, with identical filters.
+   */
+  eventType?: string;
+  eventTypes?: string[];
   props?: InputPropertyMap;
   sampleData: unknown;
   /**
@@ -50,6 +58,9 @@ function buildFilters(
   for (const [key, value] of Object.entries(propsValue)) {
     if (key === 'auth' || key === 'markdown') continue;
     if (value === undefined || value === null || value === '') continue;
+    // An empty account list means "every connected account" — the same as
+    // not filtering at all, so it never reaches the subscription.
+    if (Array.isArray(value) && value.length === 0) continue;
     filters[key] = value;
   }
 
@@ -93,7 +104,17 @@ async function getClientContext(context: { project: { id: string; externalId: ()
   };
 }
 
+function eventTypesOf(config: OpplifyTriggerConfig): string[] {
+  const types = config.eventTypes ?? (config.eventType ? [config.eventType] : []);
+  if (types.length === 0) {
+    throw new Error(`Trigger ${config.name} declares no event type`);
+  }
+  return types;
+}
+
 export function createOpplifyTrigger(config: OpplifyTriggerConfig) {
+  const eventTypes = eventTypesOf(config);
+
   return createTrigger({
     auth: opplifyAuth,
     name: config.name,
@@ -112,21 +133,32 @@ export function createOpplifyTrigger(config: OpplifyTriggerConfig) {
       if (config.scopeToOwnFlow) {
         filters['sequenceFlowId'] = context.flows.current.id;
       }
-      const subscriptionId = await client.subscribe({
-        eventType: config.eventType,
-        webhookUrl: context.webhookUrl,
-        flowId: context.flows.current.id,
-        triggerName: config.name,
-        filters,
-      });
-      await context.store.put('subscriptionId', subscriptionId);
+      const subscriptionIds: string[] = [];
+      for (const eventType of eventTypes) {
+        const subscriptionId = await client.subscribe({
+          eventType,
+          webhookUrl: context.webhookUrl,
+          flowId: context.flows.current.id,
+          triggerName: config.name,
+          filters,
+        });
+        subscriptionIds.push(subscriptionId);
+      }
+      await context.store.put('subscriptionIds', subscriptionIds);
+      // Single-event triggers published before the multi-event store key
+      // existed read `subscriptionId`; keep writing it so a downgrade or an
+      // older worker can still unsubscribe.
+      await context.store.put('subscriptionId', subscriptionIds[0]);
     },
 
     async onDisable(context) {
-      const subscriptionId = await context.store.get<string>('subscriptionId');
-      if (subscriptionId) {
-        const ctx = await getClientContext(context);
-        const client = opplifyClient(ctx);
+      const stored = await context.store.get<string[]>('subscriptionIds');
+      const legacy = await context.store.get<string>('subscriptionId');
+      const ids = new Set<string>([...(stored ?? []), ...(legacy ? [legacy] : [])]);
+      if (ids.size === 0) return;
+      const ctx = await getClientContext(context);
+      const client = opplifyClient(ctx);
+      for (const subscriptionId of ids) {
         await client.unsubscribe({ subscriptionId });
       }
     },
@@ -139,7 +171,7 @@ export function createOpplifyTrigger(config: OpplifyTriggerConfig) {
       const ctx = await getClientContext(context);
       const client = opplifyClient(ctx);
       const testData = await client.testTrigger({
-        eventType: config.eventType,
+        eventType: eventTypes[0],
         filters: buildFilters(
           context.propsValue as Record<string, unknown>,
           config.sourceType
