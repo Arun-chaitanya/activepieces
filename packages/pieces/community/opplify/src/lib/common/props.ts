@@ -528,6 +528,48 @@ export const socialIntegrationsMultiDropdown = setupPanel(
   })
 );
 
+/**
+ * Instagram accounts only. The story-reply trigger uses this: Facebook Page
+ * story replies reach Messenger as ordinary messages with no story marker,
+ * so a Facebook account can never fire it and must not be offered.
+ */
+export const instagramIntegrationsMultiDropdown = setupPanel(
+  Property.MultiSelectDropdown({
+    auth: PieceAuth.None(),
+    displayName: 'Connected accounts',
+    description:
+      'Fire for these Instagram accounts. Leave empty for every connected Instagram account.',
+    required: false,
+    refreshers: [],
+    options: async (_propsValue, context) => {
+      try {
+        const ctx = await ctxFromProperty(context);
+        const client = opplifyClient(ctx);
+        const result = (await client.getMeta('social-integrations')) as {
+          integrations: SocialIntegrationOption[];
+        };
+        const integrations = (result.integrations || []).filter(
+          (i) => (i.channel ?? (i.provider_identifier === 'facebook' ? 'facebook' : 'instagram')) === 'instagram'
+        );
+        if (integrations.length === 0) {
+          return {
+            disabled: true,
+            options: [],
+            placeholder: 'Connect an Instagram account first',
+          };
+        }
+        return {
+          disabled: false,
+          options: integrations.map((i) => ({ label: accountLabel(i), value: i.id })),
+        };
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return { disabled: true, options: [], placeholder: 'Error: ' + msg.substring(0, 100) };
+      }
+    },
+  })
+);
+
 export const mediaIdProp = setupPanel(
   Property.Dropdown({
     auth: PieceAuth.None(),
