@@ -92,6 +92,7 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   // -- Communication (new inbound) --
   email_received: { event: 'email_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: 'john@example.com', subject: 'Re: Your proposal', body: 'I reviewed the proposal and have some questions.' } },
   sms_received: { event: 'sms_received', timestamp: NOW, lead: SAMPLE_LEAD, data: { from: '+14155551234', message: 'Yes, I am interested. Please call me.' } },
+  email_subscribed: { event: 'email_subscribed', timestamp: NOW, lead: SAMPLE_LEAD, data: { previousStatus: 'pending_confirmation', basis: 'double_opt_in', sourceType: 'form' } },
   email_unsubscribed: { event: 'email_unsubscribed', timestamp: NOW, lead: SAMPLE_LEAD, data: { email: 'john@example.com', reason: 'No longer interested' } },
 
   // -- WhatsApp (AISensy) --

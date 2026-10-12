@@ -102,6 +102,7 @@ import { googleReviewUpdated } from './lib/triggers/reviews/google-review-update
 import { emailReceived } from './lib/triggers/communication/email-received';
 import { smsReceived } from './lib/triggers/communication/sms-received';
 import { emailUnsubscribed } from './lib/triggers/communication/email-unsubscribed';
+import { emailSubscribed } from './lib/triggers/communication/email-subscribed';
 
 // WhatsApp via AISensy (5)
 import { whatsappSent } from './lib/triggers/communication/whatsapp-sent';
@@ -127,6 +128,7 @@ import { removeTagAction } from './lib/actions/contacts/remove-tag';
 import { setCustomFieldAction } from './lib/actions/contacts/set-custom-field';
 import { editLeadAction } from './lib/actions/contacts/edit-lead';
 import { setDndAction } from './lib/actions/contacts/set-dnd';
+import { setEmailStatusAction } from './lib/actions/contacts/set-email-status';
 import { deleteLeadAction } from './lib/actions/contacts/delete-lead';
 
 // Category 2: Funnels (4)
@@ -233,6 +235,7 @@ export const opplify = createPiece({
     emailBounced,
     emailReceived,
     emailUnsubscribed,
+    emailSubscribed,
     spamReported,
     smsSent,
     smsDelivered,
@@ -309,6 +312,7 @@ export const opplify = createPiece({
     setCustomFieldAction,
     editLeadAction,
     setDndAction,
+    setEmailStatusAction,
     deleteLeadAction,
     // Funnels (4)
     createFunnelAction,
