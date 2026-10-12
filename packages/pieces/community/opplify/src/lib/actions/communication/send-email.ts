@@ -1,17 +1,25 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
-import { emailSenderDropdown } from '../../common/props';
+import {
+  emailSenderDropdown,
+  emailTemplateDropdown,
+  emailTopicDropdown,
+  emailTypeDropdown,
+} from '../../common/props';
 
 export const sendEmailAction = createAction({
   name: 'send_email',
   displayName: 'Send Email',
   description:
-    'Sends an email to a lead via your configured email integration.',
+    "Sends an email to a lead: a saved template or a written body, as Marketing or Transactional, from the company's email address or a teammate's Gmail. Output: sent (true/false), sendId, and reason when the lead was not sent the email (unsubscribed, daily limit, ...). Not sending is not a step failure, so a following condition can branch on sent.",
   auth: opplifyAuth,
   requireAuth: true,
   props: {
     sender: emailSenderDropdown,
+    emailType: emailTypeDropdown,
+    template: emailTemplateDropdown,
+    topic: emailTopicDropdown,
     leadId: Property.ShortText({
       defaultValue: "{{trigger['lead']['id']}}",
       displayName: 'Lead ID',
@@ -20,13 +28,13 @@ export const sendEmailAction = createAction({
     }),
     subject: Property.ShortText({
       displayName: 'Subject',
-      description: 'Email subject line',
-      required: true,
+      description: "Email subject line. Optional with a template (the template's subject is used when empty).",
+      required: false,
     }),
     body: Property.LongText({
       displayName: 'Body',
-      description: 'HTML email body',
-      required: true,
+      description: 'HTML email body. Not used when a template is chosen.',
+      required: false,
     }),
     fromName: Property.ShortText({
       displayName: 'From Name',
@@ -42,10 +50,18 @@ export const sendEmailAction = createAction({
       subject: context.propsValue.subject,
       body: context.propsValue.body,
       fromName: context.propsValue.fromName,
-      // 'company' = send as the company via SendGrid; anything else is the
-      // teammate whose Gmail sends. The server never substitutes another
-      // account when this is absent — it errors instead.
+      // 'company' = send as the company (its address through Opplify);
+      // anything else is the teammate whose Gmail sends. The server never
+      // substitutes another account when this is absent — it errors instead.
       sender: context.propsValue.sender,
+      // Absent on steps saved before 0.30.0: the server sends those as
+      // transactional, as it always did.
+      emailType: context.propsValue.emailType,
+      template: context.propsValue.template,
+      topic: context.propsValue.topic,
+      // One email per run step: a retry of this step never sends twice.
+      flowRunId: context.run.id,
+      stepName: context.step.name,
     });
   },
 });

@@ -323,7 +323,7 @@ export const zoomHostDropdown = Property.Dropdown({
  * WHO this email is sent as. Required: a Send Email step states its sender
  * rather than letting the server pick one at run time. Options are the
  * teammates whose Google grant covers sending, plus the company's own email
- * address when SendGrid is configured.
+ * address (sent through Opplify; always offered).
  */
 export const emailSenderDropdown = Property.Dropdown({
   auth: PieceAuth.None(),
@@ -342,7 +342,7 @@ export const emailSenderDropdown = Property.Dropdown({
         return {
           disabled: true,
           options: [],
-          placeholder: 'No email account can send yet — connect Google or SendGrid on the Connections page',
+          placeholder: 'No email account can send yet — connect Google on the Connections page',
         };
       }
       return {
@@ -353,6 +353,89 @@ export const emailSenderDropdown = Property.Dropdown({
       };
     } catch {
       return { disabled: true, options: [], placeholder: 'Failed to load sending accounts' };
+    }
+  },
+});
+
+/**
+ * WHAT the company address sends this email as. Marketing passes the
+ * permission, unsubscribe, topic, daily-limit and DND checks and carries the
+ * unsubscribe footer; Transactional (a receipt, a confirmation) goes to any
+ * lead with an address who has not bounced or complained. Not required: a
+ * step saved before this field existed sends as Transactional, as it always
+ * did. New steps start on Marketing.
+ */
+export const emailTypeDropdown = Property.StaticDropdown({
+  displayName: 'Email Type',
+  description:
+    "Marketing: only leads who agreed to receive email get it, with an unsubscribe footer; it must go from the company's email address. Transactional: a receipt or confirmation the lead expects, sent even to leads who never opted in. A lead who is not sent the email does not fail the step: its output is sent: false with a reason.",
+  required: false,
+  defaultValue: 'marketing',
+  options: {
+    options: [
+      { label: 'Marketing', value: 'marketing' },
+      { label: 'Transactional (receipt or confirmation)', value: 'transactional' },
+    ],
+  },
+});
+
+/** A saved email template (Email > Templates). Wins over Body when both are set. */
+export const emailTemplateDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Template',
+  description:
+    'A saved email from Email > Templates. When chosen it is sent instead of Body, and its subject is used when Subject is empty.',
+  required: false,
+  refreshers: [],
+  options: async (_propsValue, context) => {
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('email-templates') as { templates: Array<{ id: string; label: string }> };
+      const templates = result.templates || [];
+      if (templates.length === 0) {
+        return {
+          disabled: true,
+          options: [],
+          placeholder: 'No templates yet — create one under Email > Templates',
+        };
+      }
+      return {
+        disabled: false,
+        options: templates.map((t) => ({ label: t.label, value: t.id })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load email templates' };
+    }
+  },
+});
+
+/** The email topic a marketing email is sent under; leads who opted out of it are skipped. */
+export const emailTopicDropdown = Property.Dropdown({
+  auth: PieceAuth.None(),
+  displayName: 'Topic',
+  description:
+    "Marketing only. Leads who unsubscribed from this topic are skipped. Empty = the company's default topic.",
+  required: false,
+  refreshers: ['emailType'],
+  options: async (propsValue, context) => {
+    if (propsValue['emailType'] === 'transactional') {
+      return {
+        disabled: true,
+        options: [],
+        placeholder: 'Topics apply to marketing emails only',
+      };
+    }
+    try {
+      const ctx = await ctxFromProperty(context);
+      const client = opplifyClient(ctx);
+      const result = await client.getMeta('email-topics') as { topics: Array<{ id: string; label: string }> };
+      return {
+        disabled: false,
+        options: (result.topics || []).map((t) => ({ label: t.label, value: t.id })),
+      };
+    } catch {
+      return { disabled: true, options: [], placeholder: 'Failed to load email topics' };
     }
   },
 });
