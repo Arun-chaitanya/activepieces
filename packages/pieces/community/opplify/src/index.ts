@@ -94,7 +94,10 @@ import { zoomJoined } from './lib/triggers/zoom/joined';
 import { zoomAttended } from './lib/triggers/zoom/attended';
 import { zoomNoShow } from './lib/triggers/zoom/no-show';
 
-// Category 12: Google reviews (2)
+// Category 12: Courses (1)
+import { courseEnrolled } from './lib/triggers/courses/course-enrolled';
+
+// Category 13: Google reviews (2)
 import { googleReviewReceived } from './lib/triggers/reviews/google-review-received';
 import { googleReviewUpdated } from './lib/triggers/reviews/google-review-updated';
 
@@ -293,6 +296,8 @@ export const opplify = createPiece({
     zoomJoined,
     zoomAttended,
     zoomNoShow,
+    // Courses (1)
+    courseEnrolled,
     // Google reviews (2)
     googleReviewReceived,
     googleReviewUpdated,

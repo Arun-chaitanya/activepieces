@@ -62,9 +62,10 @@ export const SAMPLE_DATA: Record<string, unknown> = {
   appointment_no_show: { event: 'appointment_no_show', timestamp: NOW, lead: SAMPLE_LEAD, data: { appointmentId: '550e8400-0000-0000-0000-000000000030' } },
 
   // -- Zoom (keys mirror the REAL dispatched payloads in src/lib/integrations/zoom/) --
-  zoom_registered: { event: 'zoom_registered', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', joinUrl: 'https://zoom.us/w/81931356157?tk=abc123', registrantId: 'reg_abc123' } },
+  zoom_registered: { event: 'zoom_registered', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', joinUrl: 'https://zoom.us/w/81931356157?tk=abc123', registrantId: 'reg_abc123', startTime: '2026-10-16T13:30:00.000Z' } },
   zoom_joined: { event: 'zoom_joined', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting' } },
   zoom_attended: { event: 'zoom_attended', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', durationMinutes: 42, attendancePercentage: 70.5, pollsAnswered: 2, questionsAsked: 1 } },
+  course_enrolled: { event: 'course_enrolled', timestamp: NOW, lead: SAMPLE_LEAD, data: { courseId: '550e8400-0000-0000-0000-000000000090', courseTitle: 'Growth Foundations', enrollmentId: '550e8400-0000-0000-0000-000000000091', orderId: null, source: 'checkout' } },
   zoom_no_show: { event: 'zoom_no_show', timestamp: NOW, lead: SAMPLE_LEAD, data: { meetingId: '81931356157', topic: 'Networking Event', eventKind: 'meeting', durationMinutes: 0, attendancePercentage: null, pollsAnswered: 0, questionsAsked: 0 } },
 
   // -- Deals --
