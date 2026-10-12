@@ -12,12 +12,16 @@ import { socialActionCtx } from '../social/_shared';
  * with the engine's webhook pause and is woken by the event bridge (one of
  * the chosen events for this lead) or by the timeout scanner. Resumed, the
  * step returns { outcome, event, data } for a router to branch on.
+ *
+ * With emailSendId (0.30.0) the wait reacts only to the email an earlier
+ * Send Email step sent from the company address; the server reads the
+ * step's saved settings to refuse a mapping that rendered empty.
  */
 export const waitForEventAction = createAction({
   name: 'wait_for_event',
   displayName: 'Wait for the Lead to Do Something',
   description:
-    "Pauses this automation until the lead does one of the chosen things — replies, books, submits a form, clicks — or until the maximum wait passes, whichever comes first. Events from before this step do not count. The step's output is outcome: 'event' (with event = which one, and data = its details) or 'timeout'; a router on outcome decides what happens next.",
+    "Pauses this automation until the lead does one of the chosen things — replies, books, submits a form, clicks — or until the maximum wait passes, whichever comes first. Events from before this step do not count. With Only this email set to a Send Email step's sendId, only that email's opens, clicks and replies count. The step's output is outcome: 'event' (with event = which one, and data = its details) or 'timeout'; a router on outcome decides what happens next.",
   auth: opplifyAuth,
   requireAuth: true,
   errorHandlingOptions: {
@@ -52,6 +56,12 @@ export const waitForEventAction = createAction({
         },
       })
     ),
+    emailSendId: Property.ShortText({
+      displayName: 'Only this email',
+      description:
+        "Optional. Map the sendId of an earlier Send Email step (company address) so that only opens, clicks and replies on THAT email count. Leave empty to count any email. Gmail sends have no sendId.",
+      required: false,
+    }),
     maxWaitAmount: setupPanel(
       Property.Number({
         displayName: 'Wait at most',
@@ -93,12 +103,15 @@ export const waitForEventAction = createAction({
     const result = (await client.callAction('wait/register', {
       runId: context.run.id,
       flowId: context.flows.current.id,
+      flowVersionId: context.flows.current.version.id,
+      stepName: context.step.name,
       leadId: context.propsValue.leadId,
       events: context.propsValue.events,
       maxWait: {
         amount: Number(context.propsValue.maxWaitAmount),
         unit: context.propsValue.maxWaitUnit,
       },
+      emailSendId: context.propsValue.emailSendId,
     })) as { waitId?: string; deadlineAt?: string; error?: string };
 
     if (!result.waitId) {
