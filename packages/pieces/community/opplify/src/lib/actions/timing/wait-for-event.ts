@@ -13,7 +13,7 @@ import { socialActionCtx } from '../social/_shared';
  * the chosen events for this lead) or by the timeout scanner. Resumed, the
  * step returns { outcome, event, data } for a router to branch on.
  *
- * With emailSendId (0.30.0) the wait reacts only to the email an earlier
+ * With emailSendId (0.32.0) the wait reacts only to the email an earlier
  * Send Email step sent from the company address; the server reads the
  * step's saved settings to refuse a mapping that rendered empty.
  */

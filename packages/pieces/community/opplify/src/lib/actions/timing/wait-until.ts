@@ -10,7 +10,7 @@ import { socialActionCtx } from '../social/_shared';
  * resume instant in the company timezone (DST-safe); the run pauses with the
  * engine's own delay mechanism, so the wait survives worker restarts.
  *
- * "Some time before a date" (0.30.0, email Story 4.4): with Wait for = a
+ * "Some time before a date" (0.32.0, email Story 4.4): with Wait for = a
  * date, the step waits until that date minus the offset, e.g. 24 hours
  * before a webinar's startTime. It never acts late: a moment already behind
  * (or a wake long after it) answers outcome 'past' without waiting, and an

@@ -54,10 +54,10 @@ export const sendEmailAction = createAction({
       // anything else is the teammate whose Gmail sends. The server never
       // substitutes another account when this is absent — it errors instead.
       sender: context.propsValue.sender,
-      // A 0.30.0 step without a value (one written by the workflow agent, which
+      // A 0.32.0 step without a value (one written by the workflow agent, which
       // does not fill prop defaults) is Marketing, the dropdown's default, so
       // it is never sent past the permission check by omission. Steps saved
-      // before 0.30.0 run older code that sends no emailType; the server keeps
+      // before 0.32.0 run older code that sends no emailType; the server keeps
       // those transactional, as they always were.
       emailType: context.propsValue.emailType ?? 'marketing',
       template: context.propsValue.template,
