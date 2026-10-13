@@ -776,3 +776,120 @@ export const atHourDropdown = Property.StaticDropdown({
     })),
   },
 });
+
+// ============================================================================
+// GOOGLE REVIEWS
+// ============================================================================
+
+/**
+ * Connected Google Business Profile locations, multi-select. Empty = every
+ * location (the trigger drops an empty list from its filters). Stored as
+ * `integrationIds`, the same filter key the social triggers use.
+ */
+export const googleLocationsMultiDropdown = setupPanel(
+  Property.MultiSelectDropdown({
+    auth: PieceAuth.None(),
+    displayName: 'Locations',
+    description: 'Fire for reviews of these locations. Leave empty for every connected location.',
+    required: false,
+    refreshers: [],
+    options: async (_propsValue, context) => {
+      try {
+        const ctx = await ctxFromProperty(context);
+        const client = opplifyClient(ctx);
+        const result = (await client.getMeta('google-locations')) as {
+          locations: Array<{ id: string; name: string }>;
+        };
+        const locations = result.locations || [];
+        if (locations.length === 0) {
+          return {
+            disabled: true,
+            options: [],
+            placeholder: 'Connect a Google Business Profile location first',
+          };
+        }
+        return {
+          disabled: false,
+          options: locations.map((location) => ({ label: location.name, value: location.id })),
+        };
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return { disabled: true, options: [], placeholder: 'Error: ' + msg.substring(0, 100) };
+      }
+    },
+  })
+);
+
+export const reviewRatingsMultiDropdown = setupPanel(
+  Property.StaticMultiSelectDropdown({
+    displayName: 'Star ratings',
+    description: 'Fire only for these ratings, e.g. 1 and 2 stars for negative reviews. Leave empty for every rating.',
+    required: false,
+    options: {
+      options: [
+        { label: '1 star', value: '1' },
+        { label: '2 stars', value: '2' },
+        { label: '3 stars', value: '3' },
+        { label: '4 stars', value: '4' },
+        { label: '5 stars', value: '5' },
+      ],
+    },
+  })
+);
+
+export const reviewKeywordsProp = setupPanel(
+  Property.Array({
+    displayName: 'Keywords',
+    description:
+      'Fire only when the review text contains one of these words, e.g. "great" or "rude". Leave empty to fire on every review. Letter case is ignored.',
+    required: false,
+  })
+);
+
+export const reviewMatchTypeDropdown = Property.StaticDropdown({
+  displayName: 'Keyword matching',
+  description: 'How strictly the keywords must match the review text',
+  required: false,
+  defaultValue: 'contains',
+  options: {
+    options: [
+      { label: 'Review contains the keyword', value: 'contains' },
+      { label: 'Keyword appears as a whole word', value: 'any_word' },
+    ],
+  },
+});
+
+/** One connected Google Business Profile location (review requests). */
+export const googleLocationDropdown = setupPanel(
+  Property.Dropdown({
+    auth: PieceAuth.None(),
+    displayName: 'Location',
+    description: 'The location the contact is asked to review.',
+    required: true,
+    refreshers: [],
+    options: async (_propsValue, context) => {
+      try {
+        const ctx = await ctxFromProperty(context);
+        const client = opplifyClient(ctx);
+        const result = (await client.getMeta('google-locations')) as {
+          locations: Array<{ id: string; name: string }>;
+        };
+        const locations = result.locations || [];
+        if (locations.length === 0) {
+          return {
+            disabled: true,
+            options: [],
+            placeholder: 'Connect a Google Business Profile location first',
+          };
+        }
+        return {
+          disabled: false,
+          options: locations.map((location) => ({ label: location.name, value: location.id })),
+        };
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return { disabled: true, options: [], placeholder: 'Error: ' + msg.substring(0, 100) };
+      }
+    },
+  })
+);

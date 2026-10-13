@@ -94,6 +94,10 @@ import { zoomJoined } from './lib/triggers/zoom/joined';
 import { zoomAttended } from './lib/triggers/zoom/attended';
 import { zoomNoShow } from './lib/triggers/zoom/no-show';
 
+// Category 12: Google reviews (2)
+import { googleReviewReceived } from './lib/triggers/reviews/google-review-received';
+import { googleReviewUpdated } from './lib/triggers/reviews/google-review-updated';
+
 // Category 3 additions: Inbound Communication (3)
 import { emailReceived } from './lib/triggers/communication/email-received';
 import { smsReceived } from './lib/triggers/communication/sms-received';
@@ -156,6 +160,12 @@ import { createNoteAction } from './lib/actions/communication/create-note';
 
 // Zoom (1)
 import { registerZoomLeadAction } from './lib/actions/zoom/register-lead';
+
+// Google reviews (4)
+import { replyToGoogleReviewAction } from './lib/actions/reviews/reply-to-google-review';
+import { notifyTeamAboutReviewAction } from './lib/actions/reviews/notify-team-about-review';
+import { updateReviewContactAction } from './lib/actions/reviews/update-review-contact';
+import { sendGoogleReviewRequestAction } from './lib/actions/reviews/send-google-review-request';
 
 // Category 4: Appointments (5)
 import { createAppointmentAction } from './lib/actions/appointments/create-appointment';
@@ -280,6 +290,9 @@ export const opplify = createPiece({
     zoomJoined,
     zoomAttended,
     zoomNoShow,
+    // Google reviews (2)
+    googleReviewReceived,
+    googleReviewUpdated,
   ],
 
   actions: [
@@ -325,6 +338,11 @@ export const opplify = createPiece({
     createNoteAction,
     // Zoom (1)
     registerZoomLeadAction,
+    // Google reviews (4)
+    sendGoogleReviewRequestAction,
+    replyToGoogleReviewAction,
+    notifyTeamAboutReviewAction,
+    updateReviewContactAction,
     // Appointments (5)
     createAppointmentAction,
     cancelAppointmentAction,
