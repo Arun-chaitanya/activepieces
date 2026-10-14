@@ -1,9 +1,135 @@
-import { createAction, Property } from '@activepieces/pieces-framework';
+import { createAction, InputPropertyMap, PieceAuth, Property } from '@activepieces/pieces-framework';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
-import { googleLocationDropdown } from '../../common/props';
+import { ctxFromProperty, googleLocationDropdown } from '../../common/props';
 import { setupPanel } from '../../common/setup-panel';
 import { socialActionCtx } from '../social/_shared';
+
+// Same copy the Opplify server falls back to (review-request-template.ts),
+// shown up front so the step starts with a ready, editable message.
+const DEFAULT_EMAIL_SUBJECT = 'How did we do, {first_name}?';
+const DEFAULT_EMAIL_MESSAGE =
+  'Hi {first_name}, thank you for choosing {business}! Would you share your experience in a quick Google review? It only takes a minute: {link}';
+/** Short enough that names and the link still fit one 160-character SMS. */
+const DEFAULT_SMS_MESSAGE =
+  'Hi {first_name}, how was {business}? A quick Google review would mean a lot: {link}';
+const DEFAULT_REMINDER_MESSAGE =
+  'Hi {first_name}, a gentle reminder: a review of {business} would mean a lot to us. {link}';
+
+/** An approved template from the connected WhatsApp, with the values it needs. */
+interface ApprovedTemplate {
+  name: string;
+  label: string;
+  language: string | null;
+  defaultParams: string[];
+}
+
+async function loadApprovedTemplates(
+  client: ReturnType<typeof opplifyClient>
+): Promise<{ templates: ApprovedTemplate[]; reason?: string }> {
+  const result = (await client.getMeta('whatsapp-templates')) as {
+    templates?: ApprovedTemplate[];
+    reason?: string;
+  };
+  return { templates: result.templates ?? [], reason: result.reason };
+}
+
+const TOKENS_HELP = '{link} is your review link. Also: {first_name} {business} {location}.';
+
+/** The connected WhatsApp's approved templates, or a disabled box saying why there are none. */
+async function whatsappTemplateDropdown(context: {
+  project: { id: string; externalId: () => Promise<string | undefined> };
+}) {
+  const field = {
+    displayName: 'WhatsApp template',
+    description:
+      'Your approved templates from the connected WhatsApp. The first name and the review link are filled in for you.',
+    required: true,
+  } as const;
+  try {
+    const { templates, reason } = await loadApprovedTemplates(
+      opplifyClient(await ctxFromProperty(context))
+    );
+    if (templates.length === 0) {
+      return Property.StaticDropdown({
+        ...field,
+        options: {
+          disabled: true,
+          options: [],
+          placeholder: reason
+            ? reason.substring(0, 100)
+            : 'No approved WhatsApp templates yet. Create one and wait for WhatsApp to approve it',
+        },
+      });
+    }
+    return Property.StaticDropdown({
+      ...field,
+      options: {
+        options: templates.map((template) => ({
+          label: template.language ? `${template.label} (${template.language})` : template.label,
+          value: template.name,
+        })),
+      },
+    });
+  } catch {
+    return Property.StaticDropdown({
+      ...field,
+      options: { disabled: true, options: [], placeholder: 'Failed to load WhatsApp templates' },
+    });
+  }
+}
+
+/**
+ * Only the chosen channel's fields. Email and SMS keep separate keys so
+ * switching channel never carries a long email message into an SMS.
+ */
+const channelFields = setupPanel(
+  Property.DynamicProperties({
+    auth: PieceAuth.None(),
+    displayName: 'Message',
+    required: false,
+    refreshers: ['channel'],
+    props: async ({ channel }, context) => {
+      const fields: InputPropertyMap = {};
+      const selected = (channel as unknown as string | undefined) ?? 'email';
+      if (selected === 'email') {
+        fields['emailSubject'] = Property.ShortText({
+          displayName: 'Email subject',
+          required: false,
+          defaultValue: DEFAULT_EMAIL_SUBJECT,
+        });
+        fields['emailMessage'] = Property.ShortText({
+          displayName: 'Email message',
+          description: TOKENS_HELP,
+          required: false,
+          defaultValue: DEFAULT_EMAIL_MESSAGE,
+        });
+        fields['emailReminderMessage'] = Property.ShortText({
+          displayName: 'Reminder message',
+          description: 'Used only when reminders are on. Same tokens.',
+          required: false,
+          defaultValue: DEFAULT_REMINDER_MESSAGE,
+        });
+      } else if (selected === 'sms') {
+        fields['smsMessage'] = Property.ShortText({
+          displayName: 'SMS message',
+          description: `${TOKENS_HELP} Keep it under 160 characters once filled in.`,
+          required: false,
+          defaultValue: DEFAULT_SMS_MESSAGE,
+        });
+        fields['smsReminderMessage'] = Property.ShortText({
+          displayName: 'Reminder message',
+          description: 'Used only when reminders are on. Same tokens.',
+          required: false,
+          defaultValue: DEFAULT_REMINDER_MESSAGE,
+        });
+      } else if (selected === 'whatsapp') {
+        fields['whatsappTemplateName'] = await whatsappTemplateDropdown(context);
+      }
+      return fields;
+    },
+  })
+);
 
 export const sendGoogleReviewRequestAction = createAction({
   name: 'send_google_review_request',
@@ -37,31 +163,7 @@ export const sendGoogleReviewRequestAction = createAction({
         },
       })
     ),
-    message: setupPanel(
-      Property.LongText({
-        displayName: 'Message',
-        description:
-          'Email and SMS text. {first_name}, {business}, {location} and {link} are filled in; without {link} the link is added at the end. Leave empty for a friendly default.',
-        required: false,
-      })
-    ),
-    emailSubject: Property.ShortText({
-      displayName: 'Email subject',
-      description: 'Default: "How did we do, {first_name}?"',
-      required: false,
-    }),
-    whatsappTemplateName: Property.ShortText({
-      displayName: 'WhatsApp template name',
-      description:
-        'Required for WhatsApp: an APPROVED template (WhatsApp only allows templates for messages you start).',
-      required: false,
-    }),
-    whatsappTemplateParams: Property.Array({
-      displayName: 'WhatsApp template parameters',
-      description:
-        'One value per template variable, in order: message variables first, then one per "Visit website" button. Tokens: {first_name} {business} {location} {link} (the tracked link) and {link_code} (only its code, for a button whose URL ends in /l/{{1}}). Leave empty to send {{1}} first name, {{2}} review link.',
-      required: false,
-    }),
+    channelFields,
     maxReminders: setupPanel(
       Property.StaticDropdown({
         displayName: 'Reminders if they do not click',
@@ -81,11 +183,6 @@ export const sendGoogleReviewRequestAction = createAction({
       required: false,
       defaultValue: 3,
     }),
-    reminderMessage: Property.LongText({
-      displayName: 'Reminder message',
-      description: 'Email and SMS reminder text, same tokens. Leave empty for a gentle default.',
-      required: false,
-    }),
     skipRecentlyAsked: Property.Checkbox({
       displayName: 'Skip contacts asked in the last 30 days or who already reviewed',
       required: false,
@@ -94,18 +191,35 @@ export const sendGoogleReviewRequestAction = createAction({
   },
   async run(context) {
     const props = context.propsValue;
+    const fields = (props.channelFields ?? {}) as Record<string, unknown>;
+    // Steps saved before 0.32.1 kept these at the top level.
+    const legacy = props as unknown as Record<string, unknown>;
+    const pick = (key: string, legacyKey = key) => fields[key] ?? legacy[legacyKey];
+    const isSms = props.channel === 'sms';
     const client = opplifyClient(await socialActionCtx(context));
+    const templateName = pick('whatsappTemplateName') as string | undefined;
+    let templateParams = ((pick('whatsappTemplateParams') ?? []) as unknown[]).map(String);
+    // The step shows no values box: fill them from the template, as the
+    // send panel does. Older steps that listed values keep theirs.
+    if (props.channel === 'whatsapp' && templateName && templateParams.length === 0) {
+      try {
+        const { templates } = await loadApprovedTemplates(client);
+        templateParams = templates.find((t) => t.name === templateName)?.defaultParams ?? [];
+      } catch {
+        templateParams = [];
+      }
+    }
     return await client.callAction('google-business/review-request', {
       leadId: props.leadId,
       integrationId: props.integrationId,
       channel: props.channel,
-      message: props.message,
-      emailSubject: props.emailSubject,
-      whatsappTemplateName: props.whatsappTemplateName,
-      whatsappTemplateParams: (props.whatsappTemplateParams ?? []).map(String),
+      message: pick(isSms ? 'smsMessage' : 'emailMessage', 'message'),
+      emailSubject: pick('emailSubject'),
+      whatsappTemplateName: templateName,
+      whatsappTemplateParams: templateParams,
       maxReminders: Number(props.maxReminders ?? 0),
       reminderDays: props.reminderDays ?? 3,
-      reminderMessage: props.reminderMessage,
+      reminderMessage: pick(isSms ? 'smsReminderMessage' : 'emailReminderMessage', 'reminderMessage'),
       skipRecentlyAsked: props.skipRecentlyAsked !== false,
       flowRunId: context.run.id,
     });

@@ -1,4 +1,4 @@
-import { createAction, Property } from '@activepieces/pieces-framework';
+import { createAction, InputPropertyMap, PieceAuth, Property } from '@activepieces/pieces-framework';
 import { ExecutionType, PauseType } from '@activepieces/shared';
 import { opplifyAuth } from '../../common/auth';
 import { opplifyClient } from '../../common/client';
@@ -12,8 +12,77 @@ const UNIT_MS: Record<string, number> = {
   days: 24 * 60 * 60 * 1000,
 };
 
+/**
+ * The wait in ms: the replyDelay choice (minutes), or the amount and unit
+ * that steps saved before 0.32.2 kept.
+ */
+function replyDelayMs(props: Record<string, unknown>): number {
+  if (props['replyDelay'] !== undefined && props['replyDelay'] !== null) {
+    const minutes = Number(props['replyDelay']);
+    return Number.isFinite(minutes) && minutes > 0 ? minutes * UNIT_MS['minutes'] : 0;
+  }
+  const amount = Number(props['delayAmount'] ?? 0);
+  const unitMs = UNIT_MS[String(props['delayUnit'] ?? 'hours')] ?? UNIT_MS['hours'];
+  return Number.isFinite(amount) && amount > 0 ? amount * unitMs : 0;
+}
+
 /** Delays up to a minute run in-process; longer ones pause the run. */
 const IN_PROCESS_DELAY_MS = 60 * 1000;
+
+const DEFAULT_TONE = 'friendly';
+
+const DEFAULT_TEMPLATE =
+  'Thank you so much for taking the time to leave us a review! We really appreciate your feedback and hope to see you again soon.';
+
+/** Starting guidance for the AI per tone, so the box is never empty. */
+const DEFAULT_BRAND_NOTES: Record<string, string> = {
+  friendly:
+    'Sound friendly and relaxed. Thank the reviewer by name, mention something specific from their review, and invite them back. Keep it to 2-3 short sentences.',
+  professional:
+    'Sound polite and professional. Thank the reviewer, respond to the main point of their review, and keep it to 2-3 sentences. No emojis.',
+  warm:
+    'Sound warm and personal, like the owner replying. Thank the reviewer by name, show how much their visit means to us, and invite them back. Keep it to 2-3 sentences.',
+  apologetic:
+    'Apologise sincerely for what went wrong without making excuses, and invite them to get in touch so we can make it right. Do not invent contact details. Keep it calm and to 2-4 sentences.',
+  enthusiastic:
+    'Sound upbeat and excited. Thank the reviewer with energy, celebrate what they enjoyed, and invite them back. One emoji at most.',
+};
+
+/**
+ * Only the chosen mode's box: brand voice for an AI reply, the text for a
+ * template. Brand voice is keyed by tone so changing the tone brings that
+ * tone's starting text instead of keeping the previous one.
+ */
+const replyContent = setupPanel(
+  Property.DynamicProperties({
+    auth: PieceAuth.None(),
+    displayName: 'Reply',
+    required: false,
+    refreshers: ['replyMode', 'tone'],
+    props: async ({ replyMode, tone }) => {
+      const fields: InputPropertyMap = {};
+      if ((replyMode as unknown as string) === 'template') {
+        fields['template'] = Property.ShortText({
+          displayName: 'Template',
+          description:
+            'The reply posted as written. Edit it freely; insert trigger data such as the reviewer first name from the data picker.',
+          required: true,
+          defaultValue: DEFAULT_TEMPLATE,
+        });
+        return fields;
+      }
+      const selected = (tone as unknown as string | undefined) || DEFAULT_TONE;
+      fields[`brandNotes_${selected}`] = Property.ShortText({
+        displayName: 'Brand voice and notes',
+        description:
+          'Guidance for the AI: how you talk, what to mention, how to sign off. Edit it to fit your business.',
+        required: false,
+        defaultValue: DEFAULT_BRAND_NOTES[selected] ?? DEFAULT_BRAND_NOTES[DEFAULT_TONE],
+      });
+      return fields;
+    },
+  })
+);
 
 export const replyToGoogleReviewAction = createAction({
   name: 'reply_to_google_review',
@@ -39,20 +108,12 @@ export const replyToGoogleReviewAction = createAction({
         },
       })
     ),
-    template: setupPanel(
-      Property.LongText({
-        displayName: 'Template',
-        description:
-          `Used when replying with a fixed template. Insert trigger data such as the reviewer first name, e.g. "Thank you, {{trigger['data']['reviewer_first_name']}}!"`,
-        required: false,
-      })
-    ),
     tone: setupPanel(
       Property.StaticDropdown({
         displayName: 'Tone',
-        description: 'How the AI reply should sound',
+        description: 'How the AI reply should sound (AI replies only)',
         required: false,
-        defaultValue: 'friendly',
+        defaultValue: DEFAULT_TONE,
         options: {
           options: [
             { label: 'Friendly', value: 'friendly' },
@@ -64,32 +125,25 @@ export const replyToGoogleReviewAction = createAction({
         },
       })
     ),
-    brandNotes: Property.LongText({
-      displayName: 'Brand voice and notes',
-      description:
-        'Optional guidance for the AI: how you talk, what to mention (e.g. "We are a family-run bakery. Invite unhappy customers to email hello@example.com"), how to sign off.',
-      required: false,
-    }),
-    delayAmount: setupPanel(
-      Property.Number({
+    replyContent,
+    replyDelay: setupPanel(
+      Property.StaticDropdown({
         displayName: 'Wait before replying',
-        description: 'So the reply does not look instant. 0 replies right away.',
+        description: 'So the reply does not look instant.',
         required: false,
-        defaultValue: 0,
+        defaultValue: '0',
+        options: {
+          options: [
+            { label: 'Reply right away', value: '0' },
+            { label: '30 minutes', value: '30' },
+            { label: '1 hour', value: '60' },
+            { label: '3 hours', value: '180' },
+            { label: '1 day', value: '1440' },
+            { label: '2 days', value: '2880' },
+          ],
+        },
       })
     ),
-    delayUnit: Property.StaticDropdown({
-      displayName: 'Wait unit',
-      required: false,
-      defaultValue: 'hours',
-      options: {
-        options: [
-          { label: 'Minutes', value: 'minutes' },
-          { label: 'Hours', value: 'hours' },
-          { label: 'Days', value: 'days' },
-        ],
-      },
-    }),
     requireApprovalForLowRatings: setupPanel(
       Property.Checkbox({
         displayName: 'Require approval for 1-3 star reviews',
@@ -109,9 +163,7 @@ export const replyToGoogleReviewAction = createAction({
   async run(context) {
     const props = context.propsValue;
     if (context.executionType !== ExecutionType.RESUME) {
-      const amount = Number(props.delayAmount ?? 0);
-      const unitMs = UNIT_MS[props.delayUnit ?? 'hours'] ?? UNIT_MS['hours'];
-      const delayMs = Number.isFinite(amount) && amount > 0 ? amount * unitMs : 0;
+      const delayMs = replyDelayMs(props as unknown as Record<string, unknown>);
       if (delayMs > IN_PROCESS_DELAY_MS) {
         context.run.pause({
           pauseMetadata: {
@@ -126,13 +178,17 @@ export const replyToGoogleReviewAction = createAction({
       }
     }
 
+    const fields = (props.replyContent ?? {}) as Record<string, unknown>;
+    // Steps saved before 0.32.2 kept template and brandNotes at the top level.
+    const legacy = props as unknown as Record<string, unknown>;
+    const tone = props.tone || DEFAULT_TONE;
     const client = opplifyClient(await socialActionCtx(context));
     return await client.callAction('google-business/reply', {
       reviewId: props.reviewId,
       mode: props.replyMode,
-      template: props.template,
+      template: fields['template'] ?? legacy['template'],
       tone: props.tone,
-      brandNotes: props.brandNotes,
+      brandNotes: fields[`brandNotes_${tone}`] ?? legacy['brandNotes'],
       approvalAtOrBelow: props.requireApprovalForLowRatings === false ? null : 3,
       skipIfReplied: props.skipIfReplied !== false,
       flowRunId: context.run.id,
