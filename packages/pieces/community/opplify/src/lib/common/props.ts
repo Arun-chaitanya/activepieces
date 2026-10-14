@@ -906,9 +906,10 @@ export const googleLocationsMultiDropdown = setupPanel(
 export const reviewRatingsMultiDropdown = setupPanel(
   Property.StaticMultiSelectDropdown({
     displayName: 'Star ratings',
-    description: 'Fire only for these ratings, e.g. 1 and 2 stars for negative reviews. Leave empty for every rating.',
+    description: 'Empty means all ratings. Pick stars only to narrow it, e.g. 1 and 2 stars for negative reviews.',
     required: false,
     options: {
+      placeholder: 'All ratings',
       options: [
         { label: '1 star', value: '1' },
         { label: '2 stars', value: '2' },
